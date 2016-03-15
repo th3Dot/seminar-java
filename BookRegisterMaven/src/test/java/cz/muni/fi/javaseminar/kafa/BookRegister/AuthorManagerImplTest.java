@@ -27,8 +27,8 @@ public class AuthorManagerImplTest {
     
     private AuthorManagerImpl manager;
     
-    private Author a1;
-    private Author a2;
+    private Author authorOlda;
+    private Author authorKarel;
     
     public AuthorManagerImplTest() {
     }
@@ -39,19 +39,19 @@ public class AuthorManagerImplTest {
     public void setUp() {
         this.manager = new AuthorManagerImpl();
          
-        this.a1 = new Author();
-        this.a1.setFirstname("Oldrich");
-        this.a1.setSurname("Faldik");
-        this.a1.setNationality("Czech");
-        this.a1.setDateOfBirth(LocalDate.of(1990, 10, 20));
+        authorOlda = new Author();
+        authorOlda.setFirstname("Oldrich");
+        authorOlda.setSurname("Faldik");
+        authorOlda.setNationality("Czech");
+        authorOlda.setDateOfBirth(LocalDate.of(1990, 10, 20));
         
         
-        this.a2= new Author();
-        this.a2.setFirstname("Karel");
-        this.a2.setSurname("Soukup");
-        this.a2.setNationality("Czech");
-        this.a2.setDescription("Stredovek");
-        this.a2.setDateOfBirth(LocalDate.of(1450, 11, 12));
+        authorKarel= new Author();
+        authorKarel.setFirstname("Karel");
+        authorKarel.setSurname("Soukup");
+        authorKarel.setNationality("Czech");
+        authorKarel.setDescription("Stredovek");
+        authorKarel.setDateOfBirth(LocalDate.of(1450, 11, 12));
          
          
     }
@@ -63,14 +63,14 @@ public class AuthorManagerImplTest {
      */
     @Test
     public void testCreateAuthor() {
-        manager.createAuthor(this.a1);
-        Long authorId = this.a1.getId();
+        manager.createAuthor(authorOlda);
+        Long authorId = authorOlda.getId();
         
-        assertThat(this.a1.getId(), is(not(equalTo(null))));
+        assertThat(authorOlda.getId(), is(not(equalTo(null))));
         Author result = manager.findAuthorById(authorId);
-        assertThat(result, is(equalTo(this.a1)));
+        assertThat(result, is(equalTo(authorOlda)));
         
-        assertThat(result, is(not(sameInstance(this.a1))));
+        assertThat(result, is(not(sameInstance(authorOlda))));
        
     }
 
@@ -85,19 +85,19 @@ public class AuthorManagerImplTest {
      */
     @Test
     public void testUpdateAuthor() {
-        manager.createAuthor(this.a1);
-        Long authorId = this.a1.getId();
+        manager.createAuthor(authorOlda);
+        Long authorId = authorOlda.getId();
             
-        this.a1.setSurname("Novak");
-        manager.updateAuthor(this.a1);
+        authorOlda.setSurname("Novak");
+        manager.updateAuthor(authorOlda);
         
-        this.a1 = manager.findAuthorById(authorId);
+        authorOlda = manager.findAuthorById(authorId);
         
-        assertThat(this.a1.getSurname(), is(equalTo("Novak")));
-        assertThat(this.a1.getFirstname(), is(equalTo("Oldrich")));
-        assertThat(this.a1.getDescription(), is(equalTo("Novodoby autor")));
-        assertThat(this.a1.getNationality(), is(equalTo("Czech")));
-        assertThat(this.a1.getDateOfBirth(), is(equalTo(LocalDate.of(1990, 10, 20))));
+        assertThat(authorOlda.getSurname(), is(equalTo("Novak")));
+        assertThat(authorOlda.getFirstname(), is(equalTo("Oldrich")));
+        assertThat(authorOlda.getDescription(), is(equalTo("Novodoby autor")));
+        assertThat(authorOlda.getNationality(), is(equalTo("Czech")));
+        assertThat(authorOlda.getDateOfBirth(), is(equalTo(LocalDate.of(1990, 10, 20))));
             
     }
 
@@ -106,16 +106,16 @@ public class AuthorManagerImplTest {
      */
     @Test
     public void testDeleteAuthor() {
-        manager.createAuthor(this.a1);
-        manager.createAuthor(this.a2);
+        manager.createAuthor(authorOlda);
+        manager.createAuthor(authorKarel);
        
-        assertNotNull(manager.findAuthorById(this.a1.getId()));
-        assertNotNull(manager.findAuthorById(this.a2.getId()));
+        assertNotNull(manager.findAuthorById(authorOlda.getId()));
+        assertNotNull(manager.findAuthorById(authorKarel.getId()));
 
-        manager.deleteAuthor(this.a1);
+        manager.deleteAuthor(authorOlda);
 
-        assertNull(manager.findAuthorById(this.a1.getId()));
-        assertNotNull(manager.findAuthorById(this.a2.getId()));
+        assertNull(manager.findAuthorById(authorOlda.getId()));
+        assertNotNull(manager.findAuthorById(authorKarel.getId()));
         
     }
 
@@ -124,8 +124,8 @@ public class AuthorManagerImplTest {
      */
     @Test
     public void testFindAllAuthors() {
-        manager.createAuthor(this.a1);
-        manager.createAuthor(this.a2);
+        manager.createAuthor(authorOlda);
+        manager.createAuthor(authorKarel);
         
         List<Author> expResult = Arrays.asList(a2,a1);
         
@@ -140,12 +140,12 @@ public class AuthorManagerImplTest {
      */
     @Test
     public void testFindAuthorById() {
-        manager.createAuthor(this.a1);
-        Long authorId = this.a1.getId();
+        manager.createAuthor(authorOlda);
+        Long authorId = authorOlda.getId();
         
         Author r1 = manager.findAuthorById(authorId);
         
-        assertEquals(this.a1, r1);
+        assertEquals(authorOlda, r1);
     }
     
 }
