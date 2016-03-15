@@ -1,15 +1,15 @@
 -------------------------------------------------------------------------------
 Test set: cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImplTest
 -------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 3, Skipped: 0, Time elapsed: 0.095 sec <<< FAILURE!
-testUpdateBook(cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImplTest)  Time elapsed: 0.003 sec  <<< ERROR!
+Tests run: 3, Failures: 0, Errors: 3, Skipped: 0, Time elapsed: 0.061 sec <<< FAILURE!
+testUpdateBook(cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImplTest)  Time elapsed: 0.036 sec  <<< ERROR!
 java.lang.UnsupportedOperationException: Not supported yet.
 	at cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImpl.createBook(BookManagerImpl.java:18)
-	at cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImplTest.testUpdateBook(BookManagerImplTest.java:71)
+	at cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImplTest.testUpdateBook(BookManagerImplTest.java:78)
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
+	at java.lang.reflect.Method.invoke(Method.java:483)
 	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
 	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
 	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
@@ -33,7 +33,7 @@ java.lang.UnsupportedOperationException: Not supported yet.
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
+	at java.lang.reflect.Method.invoke(Method.java:483)
 	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:164)
 	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:110)
 	at org.apache.maven.surefire.booter.SurefireStarter.invokeProvider(SurefireStarter.java:175)
@@ -42,11 +42,11 @@ java.lang.UnsupportedOperationException: Not supported yet.
 testCreateBook(cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImplTest)  Time elapsed: 0.001 sec  <<< ERROR!
 java.lang.UnsupportedOperationException: Not supported yet.
 	at cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImpl.createBook(BookManagerImpl.java:18)
-	at cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImplTest.testCreateBook(BookManagerImplTest.java:54)
+	at cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImplTest.testCreateBook(BookManagerImplTest.java:61)
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
+	at java.lang.reflect.Method.invoke(Method.java:483)
 	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
 	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
 	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
@@ -70,20 +70,20 @@ java.lang.UnsupportedOperationException: Not supported yet.
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
+	at java.lang.reflect.Method.invoke(Method.java:483)
 	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:164)
 	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:110)
 	at org.apache.maven.surefire.booter.SurefireStarter.invokeProvider(SurefireStarter.java:175)
 	at org.apache.maven.surefire.booter.SurefireStarter.runSuitesInProcessWhenForked(SurefireStarter.java:107)
 	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:68)
-testDeleteBook(cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImplTest)  Time elapsed: 0.001 sec  <<< ERROR!
+testDeleteBook(cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImplTest)  Time elapsed: 0.003 sec  <<< ERROR!
 java.lang.UnsupportedOperationException: Not supported yet.
 	at cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImpl.createBook(BookManagerImpl.java:18)
-	at cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImplTest.testDeleteBook(BookManagerImplTest.java:96)
+	at cz.muni.fi.javaseminar.kafa.BookRegister.BookManagerImplTest.testDeleteBook(BookManagerImplTest.java:103)
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
+	at java.lang.reflect.Method.invoke(Method.java:483)
 	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
 	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
 	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
@@ -107,7 +107,7 @@ java.lang.UnsupportedOperationException: Not supported yet.
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:497)
+	at java.lang.reflect.Method.invoke(Method.java:483)
 	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:164)
 	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:110)
 	at org.apache.maven.surefire.booter.SurefireStarter.invokeProvider(SurefireStarter.java:175)

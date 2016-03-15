@@ -7,6 +7,7 @@ package cz.muni.fi.javaseminar.kafa.BookRegister;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -26,6 +27,9 @@ public class AuthorManagerImplTest {
     
     private AuthorManagerImpl manager;
     
+    private Author a1;
+    private Author a2;
+    
     public AuthorManagerImplTest() {
     }
     
@@ -33,8 +37,23 @@ public class AuthorManagerImplTest {
     
     @Before
     public void setUp() {
+        this.manager = new AuthorManagerImpl();
+         
+        this.a1 = new Author();
+        this.a1.setFirstname("Oldrich");
+        this.a1.setSurname("Faldik");
+        this.a1.setNationality("Czech");
+        this.a1.setDateOfBirth(LocalDate.of(1990, 10, 20));
         
-         this.manager = new AuthorManagerImpl();
+        
+        this.a2= new Author();
+        this.a2.setFirstname("Karel");
+        this.a2.setSurname("Soukup");
+        this.a2.setNationality("Czech");
+        this.a2.setDescription("Stredovek");
+        this.a2.setDateOfBirth(LocalDate.of(1450, 11, 12));
+         
+         
     }
     
     
@@ -44,61 +63,42 @@ public class AuthorManagerImplTest {
      */
     @Test
     public void testCreateAuthor() {
-        System.out.println("createAuthor");
-        Author author = new Author();
-        author.setFirstname("Oldrich");
-        author.setSurname("Faldik");
-        author.setNationality("Czech");
-        author.setDateOfBirth(LocalDate.of(1990, 10, 20));
-        manager.createAuthor(author);
+        manager.createAuthor(this.a1);
+        Long authorId = this.a1.getId();
         
-        Long authorId = author.getId();
-        
-        
-        assertThat("saved author has null id", author.getId(), is(not(equalTo(null))));
+        assertThat(this.a1.getId(), is(not(equalTo(null))));
         Author result = manager.findAuthorById(authorId);
-        assertThat("loaded author differs from the saved one", result, is(equalTo(author)));
+        assertThat(result, is(equalTo(this.a1)));
         
-        assertThat("loaded author is the same instance", result, is(not(sameInstance(author))));
-        
-        
+        assertThat(result, is(not(sameInstance(this.a1))));
+       
     }
 
+    
+     @Test(expected=IllegalArgumentException.class)
+     public void createNullAuthor(){
+         manager.createAuthor(null);
+     
+     }       
     /**
      * Test of updateAuthor method, of class AuthorManagerImpl.
      */
     @Test
     public void testUpdateAuthor() {
-        System.out.println("updateAuthor");
+        manager.createAuthor(this.a1);
+        Long authorId = this.a1.getId();
+            
+        this.a1.setSurname("Novak");
+        manager.updateAuthor(this.a1);
         
-        Author author = new Author();
-        author.setFirstname("Oldrich");
-        author.setSurname("Faldik");
-        author.setNationality("Czech");
-        author.setDescription("Novodoby autor");
-        author.setDateOfBirth(LocalDate.of(1990, 10, 20));
+        this.a1 = manager.findAuthorById(authorId);
         
-        manager.createAuthor(author);
-        
-        Long authorId = author.getId();
-        
-        //change surname to "Novak"
-        
-        author.setSurname("Novak");
-        manager.updateAuthor(author);
-        //load from database
-        author = manager.findAuthorById(authorId);
-        
-        
-        assertThat("surname was not changed", author.getSurname(), is(equalTo("Novak")));
-        assertThat("firstname was changed when changing surname", author.getFirstname(), is(equalTo("Oldrich")));
-        assertThat("description was changed when changing surname", author.getDescription(), is(equalTo("Novodoby autor")));
-        assertThat("nationality was changed when changing surname", author.getNationality(), is(equalTo("Czech")));
-        assertThat("nationality was changed when changing surname", author.getDateOfBirth(), is(equalTo(LocalDate.of(1990, 10, 20))));
-        
-        
-        
-        
+        assertThat(this.a1.getSurname(), is(equalTo("Novak")));
+        assertThat(this.a1.getFirstname(), is(equalTo("Oldrich")));
+        assertThat(this.a1.getDescription(), is(equalTo("Novodoby autor")));
+        assertThat(this.a1.getNationality(), is(equalTo("Czech")));
+        assertThat(this.a1.getDateOfBirth(), is(equalTo(LocalDate.of(1990, 10, 20))));
+            
     }
 
     /**
@@ -106,32 +106,16 @@ public class AuthorManagerImplTest {
      */
     @Test
     public void testDeleteAuthor() {
-        System.out.println("deleteAuthor");
-        Author a1 = new Author();
-        a1.setFirstname("Oldrich");
-        a1.setSurname("Faldik");
-        a1.setNationality("Czech");
-        a1.setDescription("Novodoby autor");
-        a1.setDateOfBirth(LocalDate.of(1990, 10, 20));
-        
-        Author a2 = new Author();
-        a2.setFirstname("Karel");
-        a2.setSurname("Soukup");
-        a2.setNationality("Czech");
-        a2.setDescription("Stredovek");
-        a2.setDateOfBirth(LocalDate.of(1450, 11, 12));
-        
-        manager.createAuthor(a1);
-        manager.createAuthor(a2);
+        manager.createAuthor(this.a1);
+        manager.createAuthor(this.a2);
        
-        
-        assertNotNull(manager.findAuthorById(a1.getId()));
-        assertNotNull(manager.findAuthorById(a2.getId()));
+        assertNotNull(manager.findAuthorById(this.a1.getId()));
+        assertNotNull(manager.findAuthorById(this.a2.getId()));
 
-        manager.deleteAuthor(a1);
+        manager.deleteAuthor(this.a1);
 
-        assertNull(manager.findAuthorById(a1.getId()));
-        assertNotNull(manager.findAuthorById(a2.getId()));
+        assertNull(manager.findAuthorById(this.a1.getId()));
+        assertNotNull(manager.findAuthorById(this.a2.getId()));
         
     }
 
@@ -140,33 +124,14 @@ public class AuthorManagerImplTest {
      */
     @Test
     public void testFindAllAuthors() {
-        System.out.println("findAllAuthors");
-        Author a1 = new Author();
-        a1.setFirstname("Oldrich");
-        a1.setSurname("Faldik");
-        a1.setNationality("Czech");
-        a1.setDescription("Novodoby autor");
-        a1.setDateOfBirth(LocalDate.of(1990, 10, 20));
+        manager.createAuthor(this.a1);
+        manager.createAuthor(this.a2);
         
-        Author a2 = new Author();
-        a2.setFirstname("Karel");
-        a2.setSurname("Soukup");
-        a2.setNationality("Czech");
-        a2.setDescription("Stredovek");
-        a2.setDateOfBirth(LocalDate.of(1450, 11, 12));
+        List<Author> expResult = Arrays.asList(a2,a1);
         
-        manager.createAuthor(a1);
-        manager.createAuthor(a2);
-        
-        
-        
-        List<Author> expResult;
-        expResult = new ArrayList<>();
-        expResult.add(a2);
-        expResult.add(a1);
         List<Author> result = manager.findAllAuthors();
         
-        assertEquals("saved and retrieved list of authors differ",expResult, result);
+        assertEquals(expResult, result);
        
     }
 
@@ -175,22 +140,12 @@ public class AuthorManagerImplTest {
      */
     @Test
     public void testFindAuthorById() {
-        System.out.println("findAuthorById");
-        Author a1 = new Author();
-        a1.setFirstname("Oldrich");
-        a1.setSurname("Faldik");
-        a1.setNationality("Czech");
-        a1.setDescription("Novodoby autor");
-        a1.setDateOfBirth(LocalDate.of(1990, 10, 20));
-        
-        manager.createAuthor(a1);
-        
-        Long authorId = a1.getId();
+        manager.createAuthor(this.a1);
+        Long authorId = this.a1.getId();
         
         Author r1 = manager.findAuthorById(authorId);
         
-        
-        assertEquals("saved and retrieved authors differ",a1, r1);
+        assertEquals(this.a1, r1);
     }
     
 }

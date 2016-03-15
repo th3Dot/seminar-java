@@ -19,12 +19,12 @@ import static org.junit.Assert.*;
  */
 public class BookManagerImplTest {
     
-    private final BookManager bookManager = new BookManagerImpl();
-    private final String testBookName = "Test Book";
-    private final Long testBookId = 1L;
-    private final String testBookISBN = "Test-ISBN";
-    private final LocalDate testBookPublishDate = LocalDate.now();
-    private final Book testBook = new Book(testBookId, testBookName, testBookISBN, testBookPublishDate);
+    private BookManager bookManager;
+    private String testBookName;
+    private Long testBookId;
+    private String testBookISBN;
+    private LocalDate testBookPublishDate;
+    private Book testBook;
     
     
     public BookManagerImplTest() {
@@ -40,6 +40,14 @@ public class BookManagerImplTest {
     
     @Before
     public void setUp() {
+        bookManager = new BookManagerImpl();
+        testBookName = "Test Book";
+        testBookId = 1L;
+        testBookISBN = "Test-ISBN";
+        testBookPublishDate = LocalDate.now();
+        //clock namockovat na localdate
+        testBook = new Book(testBookId, testBookName, testBookISBN, testBookPublishDate);
+        
     }
     
     @After
