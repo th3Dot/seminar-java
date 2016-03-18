@@ -7,8 +7,8 @@ package cz.muni.fi.javaseminar.kafa.BookRegister;
 
 import java.time.LocalDate;
 
-
 public class BookBuilder {
+
     private Long id;
     private String name;
     private String isbn = null;
@@ -37,8 +37,4 @@ public class BookBuilder {
         return this;
     }
 
-    public Book createBook() {
-        return new Book(id, name, isbn, published);
-    }
-    
 }

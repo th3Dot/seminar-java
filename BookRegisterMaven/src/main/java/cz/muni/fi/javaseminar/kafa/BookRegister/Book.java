@@ -13,13 +13,6 @@ public class Book {
     private String isbn;
     private LocalDate published;
 
-    public Book(Long id, String name, String isbn, LocalDate published) {
-        this.id = id;
-        this.name = name;
-        this.isbn = isbn;
-        this.published = published;
-    }
-
     public String getName() {
         return name;
     }
@@ -77,7 +70,7 @@ public class Book {
         }
         return true;
     }
-    
-    
-    
+
+
+
 }

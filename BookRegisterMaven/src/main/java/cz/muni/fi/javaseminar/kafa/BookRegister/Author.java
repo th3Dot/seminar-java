@@ -8,6 +8,7 @@ import java.util.Objects;
  * @author martin.kalenda, Oldrich Faldik
  */
 public class Author {
+
     private Long id;
     private String firstname;
     private String surname;
@@ -59,6 +60,10 @@ public class Author {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Override
     public int hashCode() {
         int hash = 5;
@@ -96,8 +101,5 @@ public class Author {
         }
         return true;
     }
-    
-    
-    
-    
+
 }

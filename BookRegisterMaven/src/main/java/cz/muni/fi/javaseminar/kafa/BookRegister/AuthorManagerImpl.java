@@ -5,7 +5,15 @@
  */
 package cz.muni.fi.javaseminar.kafa.BookRegister;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import javax.sql.DataSource;
 
 /**
  *
@@ -13,29 +21,183 @@ import java.util.List;
  */
 public class AuthorManagerImpl implements AuthorManager {
 
+    private final DataSource dataSource;
+
+    public AuthorManagerImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    private void validate(Author author) throws IllegalArgumentException {
+        if (author == null) {
+            throw new IllegalArgumentException("author is null");
+        }
+
+        if (author.getDateOfBirth().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("date of birth is in future");
+        }
+    }
+
+    private Long getKey(ResultSet keyRS, Author author) throws ServiceFailureException, SQLException {
+        if (keyRS.next()) {
+            if (keyRS.getMetaData().getColumnCount() != 1) {
+                throw new ServiceFailureException("Internal Error: Generated key"
+                        + "retriving failed when trying to insert author " + author
+                        + " - wrong key fields count: " + keyRS.getMetaData().getColumnCount());
+            }
+            Long result = keyRS.getLong(1);
+            if (keyRS.next()) {
+                throw new ServiceFailureException("Internal Error: Generated key"
+                        + "retriving failed when trying to insert author " + author
+                        + " - more keys found");
+            }
+            return result;
+        } else {
+            throw new ServiceFailureException("Internal Error: Generated key"
+                    + "retriving failed when trying to insert author " + author
+                    + " - no key found");
+        }
+    }
+
     @Override
     public void createAuthor(Author author) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        validate(author);
+        if (author.getId() != null) {
+            throw new IllegalArgumentException("author id is already set");
+        }
+
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement st = connection.prepareStatement(
+                        "INSERT INTO AUTHOR (firstname,surname,description,nationality,dob) VALUES (?,?,?,?,?)",
+                        Statement.RETURN_GENERATED_KEYS)) {
+
+            st.setString(1, author.getFirstname());
+            st.setString(2, author.getSurname());
+            st.setString(3, author.getDescription());
+            st.setString(4, author.getNationality());
+            st.setObject(5, author.getDateOfBirth());
+            int addedRows = st.executeUpdate();
+            if (addedRows != 1) {
+                throw new ServiceFailureException("Internal Error: More rows ("
+                        + addedRows + ") inserted when trying to insert author " + author);
+            }
+
+            ResultSet keyRS = st.getGeneratedKeys();
+            author.setId(getKey(keyRS, author));
+
+        } catch (SQLException ex) {
+            throw new ServiceFailureException("Error when inserting author " + author, ex);
+        }
+
     }
 
     @Override
     public void updateAuthor(Author author) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        validate(author);
+        if (author.getId() == null) {
+            throw new IllegalArgumentException("author id is null");
+        }
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement st = connection.prepareStatement(
+                        "UPDATE Author SET firstname = ?, surname = ?, description = ?, nationality = ?, dob = ? WHERE id = ?")) {
+
+            st.setString(1, author.getFirstname());
+            st.setString(2, author.getSurname());
+            st.setString(3, author.getDescription());
+            st.setString(4, author.getNationality());
+            st.setObject(4, author.getDateOfBirth());
+            st.setObject(5, author.getId());
+
+            int count = st.executeUpdate();
+            if (count == 0) {
+                throw new EntityNotFoundException("author " + author + " was not found in database!");
+            } else if (count != 1) {
+                throw new ServiceFailureException("Invalid updated rows count detected (one row should be updated): " + count);
+            }
+        } catch (SQLException ex) {
+            throw new ServiceFailureException(
+                    "Error when updating author " + author, ex);
+        }
     }
 
     @Override
     public void deleteAuthor(Author author) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (author == null) {
+            throw new IllegalArgumentException("author is null");
+        }
+        if (author.getId() == null) {
+            throw new IllegalArgumentException("author id is null");
+        }
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement st = connection.prepareStatement(
+                        "DELETE FROM author WHERE id = ?")) {
+
+            st.setLong(1, author.getId());
+
+            int count = st.executeUpdate();
+            if (count == 0) {
+                throw new EntityNotFoundException("Author " + author + " was not found in database!");
+            } else if (count != 1) {
+                throw new ServiceFailureException("Invalid deleted rows count detected (one row should be updated): " + count);
+            }
+        } catch (SQLException ex) {
+            throw new ServiceFailureException(
+                    "Error when updating author " + author, ex);
+        }
     }
 
     @Override
     public List<Author> findAllAuthors() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement st = connection.prepareStatement(
+                        "SELECT id,firstname,surname,description,nationality,dob FROM grave")) {
+
+            ResultSet rs = st.executeQuery();
+
+            List<Author> result = new ArrayList<>();
+            while (rs.next()) {
+                result.add(resultSetToGrave(rs));
+            }
+            return result;
+
+        } catch (SQLException ex) {
+            throw new ServiceFailureException(
+                    "Error when retrieving all authors", ex);
+        }
+    }
+
+    private Author resultSetToGrave(ResultSet rs) throws SQLException {
+        Author author = new Author();
+        author.setId(rs.getLong("id"));
+        author.setFirstname(rs.getString("firstname"));
+        author.setSurname(rs.getString("surname"));
+        author.setDescription(rs.getString("description"));
+        author.setNationality(rs.getString("nationality"));
+        author.setDateOfBirth((LocalDate) rs.getObject("dob"));
+        return author;
     }
 
     @Override
     public Author findAuthorById(Long id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement st = connection.prepareStatement(
+                        "SELECT id,firstname,surname,description,nationality,dob FROM grave WHERE id = ?")) {
+
+            st.setLong(1, id);
+
+            ResultSet rs = st.executeQuery();
+
+            return resultSetToGrave(rs);
+
+        } catch (SQLException ex) {
+            throw new ServiceFailureException(
+                    "Error when retrieving author with id " + id, ex);
+        }
     }
-    
+
 }

@@ -6,57 +6,53 @@
 package cz.muni.fi.javaseminar.kafa.BookRegister;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.sql.DataSource;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import org.junit.Before;
-
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
  * @author Oldrich Faldik, martin.kalenda
  */
 public class AuthorManagerImplTest {
-    
+
     private AuthorManagerImpl manager;
-    
+
     private Author authorOlda;
     private Author authorKarel;
-    
+
     public AuthorManagerImplTest() {
     }
-    
-    
-    
+
     @Before
     public void setUp() {
-        this.manager = new AuthorManagerImpl();
-         
+        DataSource ds = null;
+        this.manager = new AuthorManagerImpl(ds);
+
         authorOlda = new Author();
         authorOlda.setFirstname("Oldrich");
         authorOlda.setSurname("Faldik");
         authorOlda.setNationality("Czech");
         authorOlda.setDateOfBirth(LocalDate.of(1990, 10, 20));
-        
-        
-        authorKarel= new Author();
+
+        authorKarel = new Author();
         authorKarel.setFirstname("Karel");
         authorKarel.setSurname("Soukup");
         authorKarel.setNationality("Czech");
         authorKarel.setDescription("Stredovek");
         authorKarel.setDateOfBirth(LocalDate.of(1450, 11, 12));
-         
-         
+
     }
-    
-    
 
     /**
      * Test of createAuthor method, of class AuthorManagerImpl.
@@ -65,21 +61,21 @@ public class AuthorManagerImplTest {
     public void testCreateAuthor() {
         manager.createAuthor(authorOlda);
         Long authorId = authorOlda.getId();
-        
+
         assertThat(authorOlda.getId(), is(not(equalTo(null))));
         Author result = manager.findAuthorById(authorId);
         assertThat(result, is(equalTo(authorOlda)));
-        
+
         assertThat(result, is(not(sameInstance(authorOlda))));
-       
+
     }
 
-    
-     @Test(expected=IllegalArgumentException.class)
-     public void createNullAuthor(){
-         manager.createAuthor(null);
-     
-     }       
+    @Test(expected = IllegalArgumentException.class)
+    public void createNullAuthor() {
+        manager.createAuthor(null);
+
+    }
+
     /**
      * Test of updateAuthor method, of class AuthorManagerImpl.
      */
@@ -87,18 +83,18 @@ public class AuthorManagerImplTest {
     public void testUpdateAuthor() {
         manager.createAuthor(authorOlda);
         Long authorId = authorOlda.getId();
-            
+
         authorOlda.setSurname("Novak");
         manager.updateAuthor(authorOlda);
-        
+
         authorOlda = manager.findAuthorById(authorId);
-        
+
         assertThat(authorOlda.getSurname(), is(equalTo("Novak")));
         assertThat(authorOlda.getFirstname(), is(equalTo("Oldrich")));
         assertThat(authorOlda.getDescription(), is(equalTo("Novodoby autor")));
         assertThat(authorOlda.getNationality(), is(equalTo("Czech")));
         assertThat(authorOlda.getDateOfBirth(), is(equalTo(LocalDate.of(1990, 10, 20))));
-            
+
     }
 
     /**
@@ -108,7 +104,7 @@ public class AuthorManagerImplTest {
     public void testDeleteAuthor() {
         manager.createAuthor(authorOlda);
         manager.createAuthor(authorKarel);
-       
+
         assertNotNull(manager.findAuthorById(authorOlda.getId()));
         assertNotNull(manager.findAuthorById(authorKarel.getId()));
 
@@ -116,7 +112,7 @@ public class AuthorManagerImplTest {
 
         assertNull(manager.findAuthorById(authorOlda.getId()));
         assertNotNull(manager.findAuthorById(authorKarel.getId()));
-        
+
     }
 
     /**
@@ -126,13 +122,13 @@ public class AuthorManagerImplTest {
     public void testFindAllAuthors() {
         manager.createAuthor(authorOlda);
         manager.createAuthor(authorKarel);
-        
-        List<Author> expResult = Arrays.asList(a2,a1);
-        
+
+        List<Author> expResult = Arrays.asList(authorOlda, authorKarel);
+
         List<Author> result = manager.findAllAuthors();
-        
+
         assertEquals(expResult, result);
-       
+
     }
 
     /**
@@ -142,10 +138,10 @@ public class AuthorManagerImplTest {
     public void testFindAuthorById() {
         manager.createAuthor(authorOlda);
         Long authorId = authorOlda.getId();
-        
+
         Author r1 = manager.findAuthorById(authorId);
-        
+
         assertEquals(authorOlda, r1);
     }
-    
+
 }
