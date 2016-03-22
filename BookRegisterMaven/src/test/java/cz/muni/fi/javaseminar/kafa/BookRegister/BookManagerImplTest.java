@@ -11,6 +11,7 @@ import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.Month;
 import javax.sql.DataSource;
 import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -91,7 +92,7 @@ public class BookManagerImplTest {
         
         testBookName = "Test Book";
         testBookISBN = "Test-ISBN";
-        testBookPublishDate = LocalDate.now();
+        testBookPublishDate = LocalDate.of(2003, Month.MARCH, 1);
         //clock namockovat na localdate
         testBook = new Book();
         testBook.setIsbn(testBookISBN);
