@@ -132,7 +132,7 @@ public class BookManagerImplTest {
     public void testUpdateBook() {
         String newBookName = "newBookName";
         String newBookISBN = "newISBN";
-        LocalDate newBookPublished = LocalDate.now();
+        LocalDate newBookPublished = LocalDate.of(2004, Month.AUGUST, 2);
         bookManager.createBook(testBook);
         Book retrievedBook = bookManager.findBookById(testBook.getId());
         assertNotNull(retrievedBook);
