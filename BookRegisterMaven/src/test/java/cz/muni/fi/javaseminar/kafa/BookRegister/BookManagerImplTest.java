@@ -5,7 +5,11 @@
  */
 package cz.muni.fi.javaseminar.kafa.BookRegister;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
+import javax.sql.DataSource;
+import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
@@ -26,6 +30,7 @@ public class BookManagerImplTest {
     private String testBookISBN;
     private LocalDate testBookPublishDate;
     private Book testBook;
+    private DataSource dataSource;
 
     public BookManagerImplTest() {
     }
@@ -38,9 +43,31 @@ public class BookManagerImplTest {
     public static void tearDownClass() {
     }
 
+    private static DataSource prepareDataSource() throws SQLException {
+        EmbeddedDataSource ds = new EmbeddedDataSource();
+        //we will use in memory database
+        ds.setDatabaseName("memory:bookregmgr-test");
+        ds.setCreateDatabase("create");
+        return ds;
+    }
+    
     @Before
-    public void setUp() {
-        bookManager = new BookManagerImpl();
+    public void setUp() throws SQLException {
+        dataSource = prepareDataSource();
+        bookManager = new BookManagerImpl(dataSource);
+        
+        
+        
+        try (Connection connection = dataSource.getConnection()) {
+            connection.prepareStatement("CREATE TABLE BOOK (" +
+    "id BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
+    "name VARCHAR(50)," +
+    "isbn VARCHAR(50)," +
+    "published DATE" +
+    ")").executeUpdate();
+        }
+        
+        
         testBookName = "Test Book";
         testBookISBN = "Test-ISBN";
         testBookPublishDate = LocalDate.now();
@@ -53,7 +80,10 @@ public class BookManagerImplTest {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            connection.prepareStatement("DROP TABLE BOOK").executeUpdate();
+        }
     }
 
     /**

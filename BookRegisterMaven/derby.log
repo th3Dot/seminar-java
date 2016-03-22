@@ -1,0 +1,26 @@
+----------------------------------------------------------------
+Mon Mar 21 22:58:39 CET 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-0153-9b2f-df71-00000680e4e0 
+on database directory memory:/Users/olda/javaSem3/seminar-java/BookRegisterMaven/bookregmgr-testAuth with class loader sun.misc.Launcher$AppClassLoader@12a3a380 
+Loaded from file:/Users/olda/.m2/repository/org/apache/derby/derby/10.12.1.1/derby-10.12.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_60-b27
+user.dir=/Users/olda/javaSem3/seminar-java/BookRegisterMaven
+os.name=Mac OS X
+os.arch=x86_64
+os.version=10.11.1
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Mon Mar 21 22:58:41 CET 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance de4ec14e-0153-9b2f-df71-00000680e4e0 
+on database directory memory:/Users/olda/javaSem3/seminar-java/BookRegisterMaven/bookregmgr-test with class loader sun.misc.Launcher$AppClassLoader@12a3a380 
+Loaded from file:/Users/olda/.m2/repository/org/apache/derby/derby/10.12.1.1/derby-10.12.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_60-b27
+user.dir=/Users/olda/javaSem3/seminar-java/BookRegisterMaven
+os.name=Mac OS X
+os.arch=x86_64
+os.version=10.11.1
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

@@ -6,6 +6,7 @@
 package cz.muni.fi.javaseminar.kafa.BookRegister;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -69,14 +70,17 @@ public class AuthorManagerImpl implements AuthorManager {
         try (
                 Connection connection = dataSource.getConnection();
                 PreparedStatement st = connection.prepareStatement(
-                        "INSERT INTO AUTHOR (firstname,surname,description,nationality,dob) VALUES (?,?,?,?,?)",
+                        "INSERT INTO AUTHOR (firstname,surname,description,nationality,dateofbirth) VALUES (?,?,?,?,?)",
                         Statement.RETURN_GENERATED_KEYS)) {
 
             st.setString(1, author.getFirstname());
             st.setString(2, author.getSurname());
             st.setString(3, author.getDescription());
             st.setString(4, author.getNationality());
-            st.setObject(5, author.getDateOfBirth());
+            
+            Date date = Date.valueOf(author.getDateOfBirth());
+            st.setDate(5, date);
+            
             int addedRows = st.executeUpdate();
             if (addedRows != 1) {
                 throw new ServiceFailureException("Internal Error: More rows ("
@@ -101,14 +105,15 @@ public class AuthorManagerImpl implements AuthorManager {
         try (
                 Connection connection = dataSource.getConnection();
                 PreparedStatement st = connection.prepareStatement(
-                        "UPDATE Author SET firstname = ?, surname = ?, description = ?, nationality = ?, dob = ? WHERE id = ?")) {
+                        "UPDATE author SET firstname = ?, surname = ?, description = ?, nationality = ?, dateofbirth = ? WHERE id = ?")) {
 
             st.setString(1, author.getFirstname());
             st.setString(2, author.getSurname());
             st.setString(3, author.getDescription());
             st.setString(4, author.getNationality());
-            st.setObject(4, author.getDateOfBirth());
-            st.setObject(5, author.getId());
+            Date date = Date.valueOf(author.getDateOfBirth());
+            st.setDate(5, date);
+            st.setLong(6, author.getId());
 
             int count = st.executeUpdate();
             if (count == 0) {
@@ -154,13 +159,13 @@ public class AuthorManagerImpl implements AuthorManager {
         try (
                 Connection connection = dataSource.getConnection();
                 PreparedStatement st = connection.prepareStatement(
-                        "SELECT id,firstname,surname,description,nationality,dob FROM grave")) {
+                        "SELECT id,firstname,surname,description,nationality,dateofbirth FROM author")) {
 
             ResultSet rs = st.executeQuery();
 
             List<Author> result = new ArrayList<>();
             while (rs.next()) {
-                result.add(resultSetToGrave(rs));
+                result.add(resultSetToAuthor(rs));
             }
             return result;
 
@@ -170,34 +175,50 @@ public class AuthorManagerImpl implements AuthorManager {
         }
     }
 
-    private Author resultSetToGrave(ResultSet rs) throws SQLException {
+    private Author resultSetToAuthor(ResultSet rs) throws SQLException {
         Author author = new Author();
         author.setId(rs.getLong("id"));
         author.setFirstname(rs.getString("firstname"));
         author.setSurname(rs.getString("surname"));
         author.setDescription(rs.getString("description"));
         author.setNationality(rs.getString("nationality"));
-        author.setDateOfBirth((LocalDate) rs.getObject("dob"));
+        
+        Date date = rs.getDate("dateofbirth");
+        LocalDate localD = date.toLocalDate();
+        
+        author.setDateOfBirth(localD);
         return author;
     }
 
     @Override
     public Author findAuthorById(Long id) {
-        try (
+           try (
                 Connection connection = dataSource.getConnection();
                 PreparedStatement st = connection.prepareStatement(
-                        "SELECT id,firstname,surname,description,nationality,dob FROM grave WHERE id = ?")) {
+                        "SELECT * FROM author WHERE id = ?")) {
 
             st.setLong(1, id);
-
             ResultSet rs = st.executeQuery();
 
-            return resultSetToGrave(rs);
+            if (rs.next()) {
+                Author author = resultSetToAuthor(rs);
+
+                if (rs.next()) {
+                    throw new ServiceFailureException(
+                            "Internal error: More entities with the same id found "
+                            + "(source id: " + id + ", found " + author + " and " + resultSetToAuthor(rs));
+                }
+
+                return author;
+            } else {
+                return null;
+            }
 
         } catch (SQLException ex) {
             throw new ServiceFailureException(
                     "Error when retrieving author with id " + id, ex);
         }
-    }
 
 }
+    
+}   

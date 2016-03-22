@@ -40,7 +40,10 @@ public class Book {
     public Long getId() {
         return id;
     }
-
+    
+    public void setId(long id) {
+        this.id=id;
+    }
     @Override
     public int hashCode() {
         int hash = 7;
