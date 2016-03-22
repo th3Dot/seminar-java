@@ -5,19 +5,18 @@
  */
 package cz.muni.fi.javaseminar.kafa.BookRegister;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.FileReader;
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 import javax.sql.DataSource;
 import org.apache.derby.jdbc.EmbeddedDataSource;
+import org.apache.ibatis.jdbc.ScriptRunner;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -41,6 +40,8 @@ public class AuthorManagerImplTest {
     private Author authorOlda;
     private Author authorKarel;
 
+    String aSQLScriptFilePath = "scriptDB.sql";
+    
     public AuthorManagerImplTest() {
     }
     
@@ -76,7 +77,26 @@ public class AuthorManagerImplTest {
         //manager = new GraveManagerImpl(dataSource);
         this.manager = new AuthorManagerImpl(dataSource);
     
-        try (Connection connection = dataSource.getConnection()) {
+        
+        try {
+            try(Connection connection = dataSource.getConnection()){
+			// Initialize object for ScripRunner
+			ScriptRunner sr = new ScriptRunner(connection);
+
+			// Give the input file to Reader
+			Reader reader = new BufferedReader(
+                               new FileReader(aSQLScriptFilePath));
+
+			// Exctute script
+			sr.runScript(reader);
+            }
+		} catch (Exception e) {
+			System.err.println("Failed to Execute" + aSQLScriptFilePath
+					+ " The error is " + e.getMessage());
+		}
+        
+        
+        /*try (Connection connection = dataSource.getConnection()) {
             connection.prepareStatement("CREATE TABLE BOOK (" +
     "id BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
     "name VARCHAR(50)," +
@@ -96,7 +116,7 @@ public class AuthorManagerImplTest {
     "book_id BIGINT," +
     "FOREIGN KEY (book_id)" +
     "REFERENCES BOOK (id))").executeUpdate();
-        }
+        }*/
         
         
         authorOlda = new Author();

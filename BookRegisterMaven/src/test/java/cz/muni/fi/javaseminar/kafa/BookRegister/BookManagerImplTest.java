@@ -5,11 +5,15 @@
  */
 package cz.muni.fi.javaseminar.kafa.BookRegister;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import javax.sql.DataSource;
 import org.apache.derby.jdbc.EmbeddedDataSource;
+import org.apache.ibatis.jdbc.ScriptRunner;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
@@ -32,6 +36,8 @@ public class BookManagerImplTest {
     private Book testBook;
     private DataSource dataSource;
 
+    String aSQLScriptFilePath = "scriptDB.sql";
+    
     public BookManagerImplTest() {
     }
 
@@ -56,16 +62,31 @@ public class BookManagerImplTest {
         dataSource = prepareDataSource();
         bookManager = new BookManagerImpl(dataSource);
         
+        try {
+            try(Connection connection = dataSource.getConnection()){
+			// Initialize object for ScripRunner
+			ScriptRunner sr = new ScriptRunner(connection);
+
+			// Give the input file to Reader
+			Reader reader = new BufferedReader(
+                               new FileReader(aSQLScriptFilePath));
+
+			// Exctute script
+			sr.runScript(reader);
+            }
+		} catch (Exception e) {
+			System.err.println("Failed to Execute" + aSQLScriptFilePath
+					+ " The error is " + e.getMessage());
+		}
         
-        
-        try (Connection connection = dataSource.getConnection()) {
+        /*try (Connection connection = dataSource.getConnection()) {
             connection.prepareStatement("CREATE TABLE BOOK (" +
     "id BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
     "name VARCHAR(50)," +
     "isbn VARCHAR(50)," +
     "published DATE" +
     ")").executeUpdate();
-        }
+        }*/
         
         
         testBookName = "Test Book";
@@ -81,7 +102,12 @@ public class BookManagerImplTest {
 
     @After
     public void tearDown() throws SQLException {
+       try (Connection connection = dataSource.getConnection()) {
+            connection.prepareStatement("DROP TABLE AUTHOR").executeUpdate();
+            
+        }
         try (Connection connection = dataSource.getConnection()) {
+           
             connection.prepareStatement("DROP TABLE BOOK").executeUpdate();
         }
     }
