@@ -13,5 +13,5 @@ hs_err_pid*
 /BookRegister/nbproject/private/
 /BookRegister/build/
 /BookRegister/dist/
-/BookRegisterMaven/nbproject/target/
-/BookRegisterMaven/derby.log/
+/BookRegisterMaven/derby.log
+/BookRegisterMaven/target
