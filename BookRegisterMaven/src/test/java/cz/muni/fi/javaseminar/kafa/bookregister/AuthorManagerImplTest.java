@@ -5,12 +5,8 @@
  */
 package cz.muni.fi.javaseminar.kafa.bookregister;
 
-import cz.muni.fi.javaseminar.kafa.bookrgister.AuthorManagerImpl;
-import cz.muni.fi.javaseminar.kafa.bookrgister.Author;
-import java.io.BufferedReader;
+import cz.muni.fi.javaseminar.kafa.common.DBUtils;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Clock;
@@ -23,7 +19,6 @@ import java.util.List;
 import java.util.TimeZone;
 import javax.sql.DataSource;
 import org.apache.derby.jdbc.EmbeddedDataSource;
-import org.apache.ibatis.jdbc.ScriptRunner;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -33,7 +28,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,8 +42,7 @@ public class AuthorManagerImplTest {
     private Author authorOlda;
     private Author authorKarel;
     private Clock clock;
-
-    String aSQLScriptFilePath = "scriptDB.sql";
+    private static final String SQL_SCRIPT_NAME = "scriptDB.sql";
 
     public AuthorManagerImplTest() {
     }
@@ -88,48 +81,10 @@ public class AuthorManagerImplTest {
         
         clock = Clock.fixed(instant, ZoneId.of("UTC"));
         
-        // String aSQLScriptFilePath = "/Users/olda/javaSem3/seminar-java/dbJavaSeminar.sql";
-        //manager = new GraveManagerImpl(dataSource);
         this.manager = new AuthorManagerImpl(dataSource, clock);
 
-        try {
-            try (Connection connection = dataSource.getConnection()) {
-                // Initialize object for ScripRunner
-                ScriptRunner sr = new ScriptRunner(connection);
+        DBUtils.executeSqlScript(dataSource,BookManager.class.getResource(SQL_SCRIPT_NAME));
 
-                // Give the input file to Reader
-                Reader reader = new BufferedReader(
-                        new FileReader(aSQLScriptFilePath));
-
-                // Exctute script
-                sr.runScript(reader);
-            }
-        } catch (Exception e) {
-            System.err.println("Failed to Execute" + aSQLScriptFilePath
-                    + " The error is " + e.getMessage());
-        }
-
-        /*try (Connection connection = dataSource.getConnection()) {
-         connection.prepareStatement("CREATE TABLE BOOK (" +
-         "id BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
-         "name VARCHAR(50)," +
-         "isbn VARCHAR(50)," +
-         "published DATE" +
-         ")").executeUpdate();
-         }
-        
-         try (Connection connection = dataSource.getConnection()) {
-         connection.prepareStatement(" CREATE TABLE AUTHOR (" +
-         "id BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY," +
-         "firstname VARCHAR(50)," +
-         "surname VARCHAR(50)," +
-         "description VARCHAR(50)," +
-         "nationality VARCHAR(50)," +
-         "dateofbirth DATE," +
-         "book_id BIGINT," +
-         "FOREIGN KEY (book_id)" +
-         "REFERENCES BOOK (id))").executeUpdate();
-         }*/
         authorOlda = new Author();
         authorOlda.setFirstname("Oldrich");
         authorOlda.setSurname("Faldik");
