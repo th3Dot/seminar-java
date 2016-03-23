@@ -5,8 +5,8 @@
  */
 package cz.muni.fi.javaseminar.kafa.bookregister;
 
+import cz.muni.fi.javaseminar.kafa.common.DBUtils;
 import cz.muni.fi.javaseminar.kafa.common.ServiceFailureException;
-import cz.muni.fi.javaseminar.kafa.common.EntityNotFoundException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -15,23 +15,46 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Clock;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author martin.kalenda
  */
+@Repository("authorManager")
 public class AuthorManagerImpl implements AuthorManager {
 
-    private final DataSource dataSource;
-    private final Clock clock;
-    
-    public AuthorManagerImpl(DataSource dataSource, Clock clock) {
+    private JdbcTemplate jdbcTemplate;
+    private Clock clock;
+    private DataSource dataSource;
+
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+    
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+    
+    @Autowired
+    public void setClock(Clock clock) {
         this.clock = clock;
     }
+    
+    public Clock getClock() {
+        return clock;
+    }
+    
 
     private void validate(Author author) throws IllegalArgumentException {
         if (author == null) {
@@ -41,98 +64,72 @@ public class AuthorManagerImpl implements AuthorManager {
         if (author.getDateOfBirth().isAfter(LocalDate.now(clock))) {
             throw new IllegalArgumentException("date of birth is in future");
         }
+
     }
 
-    private Long getKey(ResultSet keyRS, Author author) throws ServiceFailureException, SQLException {
-        if (keyRS.next()) {
-            if (keyRS.getMetaData().getColumnCount() != 1) {
-                throw new ServiceFailureException("Internal Error: Generated key"
-                        + "retriving failed when trying to insert author " + author
-                        + " - wrong key fields count: " + keyRS.getMetaData().getColumnCount());
-            }
-            Long result = keyRS.getLong(1);
-            if (keyRS.next()) {
-                throw new ServiceFailureException("Internal Error: Generated key"
-                        + "retriving failed when trying to insert author " + author
-                        + " - more keys found");
-            }
-            return result;
-        } else {
-            throw new ServiceFailureException("Internal Error: Generated key"
-                    + "retriving failed when trying to insert author " + author
-                    + " - no key found");
+    private static final RowMapper<Author> AUTHOR_MAPPER = new RowMapper<Author>() {
+
+        private Author resultSetToAuthor(ResultSet rs) throws SQLException {
+            Author author = Author.builder()
+                    .id(rs.getLong("id"))
+                    .firstname(rs.getString("firstname"))
+                    .surname(rs.getString("surname"))
+                    .description(rs.getString("description"))
+                    .nationality(rs.getString("nationality"))
+                    .dateOfBirth(rs.getDate("dateofbirth").toLocalDate())
+                    .build();
+
+            return author;
         }
-    }
+
+        @Override
+        public Author mapRow(ResultSet rs, int i) throws SQLException {
+            return resultSetToAuthor(rs);
+        }
+    };
 
     @Override
+    @Transactional(readOnly = false)
     public void createAuthor(Author author) {
-
         validate(author);
         if (author.getId() != null) {
             throw new IllegalArgumentException("author id is already set");
         }
 
-        try (
-                Connection connection = dataSource.getConnection();
-                PreparedStatement st = connection.prepareStatement(
-                        "INSERT INTO AUTHOR (firstname,surname,description,nationality,dateofbirth) VALUES (?,?,?,?,?)",
-                        Statement.RETURN_GENERATED_KEYS)) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        int updated = jdbcTemplate.update((Connection connection) -> {
+            PreparedStatement ps
+                    = connection.prepareStatement("INSERT INTO AUTHOR (firstname,surname,description,nationality,dateofbirth) VALUES (?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, author.getFirstname());
+            ps.setString(2, author.getSurname());
+            ps.setString(3, author.getDescription());
+            ps.setString(4, author.getNationality());
 
-            st.setString(1, author.getFirstname());
-            st.setString(2, author.getSurname());
-            st.setString(3, author.getDescription());
-            st.setString(4, author.getNationality());
-            
             Date date = Date.valueOf(author.getDateOfBirth());
-            st.setDate(5, date);
-            
-            int addedRows = st.executeUpdate();
-            if (addedRows != 1) {
-                throw new ServiceFailureException("Internal Error: More rows ("
-                        + addedRows + ") inserted when trying to insert author " + author);
-            }
+            ps.setDate(5, date);
 
-            ResultSet keyRS = st.getGeneratedKeys();
-            author.setId(getKey(keyRS, author));
+            return ps;
+        },
+                keyHolder);
 
-        } catch (SQLException ex) {
-            throw new ServiceFailureException("Error when inserting author " + author, ex);
-        }
+        author.setId(keyHolder.getKey().longValue());
 
+        DBUtils.checkUpdatesCount(updated, author, true);
     }
 
     @Override
+    @Transactional(readOnly = false)
     public void updateAuthor(Author author) {
         validate(author);
         if (author.getId() == null) {
             throw new IllegalArgumentException("author id is null");
         }
-        try (
-                Connection connection = dataSource.getConnection();
-                PreparedStatement st = connection.prepareStatement(
-                        "UPDATE author SET firstname = ?, surname = ?, description = ?, nationality = ?, dateofbirth = ? WHERE id = ?")) {
-
-            st.setString(1, author.getFirstname());
-            st.setString(2, author.getSurname());
-            st.setString(3, author.getDescription());
-            st.setString(4, author.getNationality());
-            Date date = Date.valueOf(author.getDateOfBirth());
-            st.setDate(5, date);
-            st.setLong(6, author.getId());
-
-            int count = st.executeUpdate();
-            if (count == 0) {
-                throw new EntityNotFoundException("author " + author + " was not found in database!");
-            } else if (count != 1) {
-                throw new ServiceFailureException("Invalid updated rows count detected (one row should be updated): " + count);
-            }
-        } catch (SQLException ex) {
-            throw new ServiceFailureException(
-                    "Error when updating author " + author, ex);
-        }
+        int updated = jdbcTemplate.update("UPDATE author SET firstname = ?, surname = ?, description = ?, nationality = ?, dateofbirth = ? WHERE id = ?", author.getFirstname(), author.getSurname(), author.getDescription(), author.getNationality(), Date.valueOf(author.getDateOfBirth()), author.getId());
+        DBUtils.checkUpdatesCount(updated, author, false);
     }
 
     @Override
+    @Transactional(readOnly = false)
     public void deleteAuthor(Author author) {
         if (author == null) {
             throw new IllegalArgumentException("author is null");
@@ -140,90 +137,27 @@ public class AuthorManagerImpl implements AuthorManager {
         if (author.getId() == null) {
             throw new IllegalArgumentException("author id is null");
         }
-        try (
-                Connection connection = dataSource.getConnection();
-                PreparedStatement st = connection.prepareStatement(
-                        "DELETE FROM author WHERE id = ?")) {
 
-            st.setLong(1, author.getId());
-
-            int count = st.executeUpdate();
-            if (count == 0) {
-                throw new EntityNotFoundException("Author " + author + " was not found in database!");
-            } else if (count != 1) {
-                throw new ServiceFailureException("Invalid deleted rows count detected (one row should be updated): " + count);
-            }
-        } catch (SQLException ex) {
-            throw new ServiceFailureException(
-                    "Error when updating author " + author, ex);
-        }
+        int updated = jdbcTemplate.update("DELETE FROM author WHERE id=?", author.getId());
+        DBUtils.checkUpdatesCount(updated, author, false);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Author> findAllAuthors() {
-        try (
-                Connection connection = dataSource.getConnection();
-                PreparedStatement st = connection.prepareStatement(
-                        "SELECT id,firstname,surname,description,nationality,dateofbirth FROM author")) {
-
-            ResultSet rs = st.executeQuery();
-
-            List<Author> result = new ArrayList<>();
-            while (rs.next()) {
-                result.add(resultSetToAuthor(rs));
-            }
-            return result;
-
-        } catch (SQLException ex) {
-            throw new ServiceFailureException(
-                    "Error when retrieving all authors", ex);
-        }
-    }
-
-    private Author resultSetToAuthor(ResultSet rs) throws SQLException {
-        Author author = Author.builder()
-                .id(rs.getLong("id"))
-                .firstname(rs.getString("firstname"))
-                .surname(rs.getString("surname"))
-                .description(rs.getString("description"))
-                .nationality(rs.getString("nationality"))
-                .build();
-        Date date = rs.getDate("dateofbirth");
-        LocalDate localD = date.toLocalDate();
-        
-        author.setDateOfBirth(localD);
-        return author;
+        return jdbcTemplate
+                .query("SELECT * FROM author", AUTHOR_MAPPER);
     }
 
     @Override
     public Author findAuthorById(Long id) {
-           try (
-                Connection connection = dataSource.getConnection();
-                PreparedStatement st = connection.prepareStatement(
-                        "SELECT * FROM author WHERE id = ?")) {
-
-            st.setLong(1, id);
-            ResultSet rs = st.executeQuery();
-
-            if (rs.next()) {
-                Author author = resultSetToAuthor(rs);
-
-                if (rs.next()) {
-                    throw new ServiceFailureException(
-                            "Internal error: More entities with the same id found "
-                            + "(source id: " + id + ", found " + author + " and " + resultSetToAuthor(rs));
-                }
-
-                return author;
-            } else {
-                return null;
-            }
-
-        } catch (SQLException ex) {
+        List<Author> foundAuthors = jdbcTemplate.query("SELECT * FROM author WHERE id = ?", AUTHOR_MAPPER, id);
+        if (foundAuthors.size() > 1) {
             throw new ServiceFailureException(
-                    "Error when retrieving author with id " + id, ex);
+                    "Internal error: More entities with the same id found "
+                    + "(source id: " + id + ", found " + foundAuthors);
         }
+        return foundAuthors.isEmpty() ? null : foundAuthors.get(0);
+    }
 
 }
-    
-}   

@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -28,9 +29,10 @@ public class BookManagerImplTest {
     private LocalDate testBookPublishDate;
     private Book testBook;
     private DataSource dataSource;
-
+    
     private static final String SQL_SCRIPT_NAME = "scriptDB.sql";
-
+    private static final ApplicationContext CTX = new ClassPathXmlApplicationContext("spring/spring-test-context.xml");
+    
     public BookManagerImplTest() {
     }
 
@@ -42,16 +44,10 @@ public class BookManagerImplTest {
     public static void tearDownClass() {
     }
 
-    private static DataSource prepareDataSource() throws SQLException {
-        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("spring/spring-context.xml");
-        return (DataSource) ctx.getBean("dataSource");
-    }
-
     @Before
     public void setUp() throws SQLException {
-        dataSource = prepareDataSource();
-        bookManager = new BookManagerImpl();
-        bookManager.setDataSource(dataSource);
+        bookManager = (BookManagerImpl) CTX.getBean("bookManager");
+        dataSource = bookManager.getDataSource();
         DBUtils.executeSqlScript(dataSource, BookManager.class.getResource(SQL_SCRIPT_NAME));
 
         testBookName = "Test Book";

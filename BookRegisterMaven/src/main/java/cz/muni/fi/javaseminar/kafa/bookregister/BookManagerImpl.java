@@ -28,14 +28,20 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Oldrich Faldik
  */
-@Repository
+@Repository("bookManager")
 public class BookManagerImpl implements BookManager {
 
     private JdbcTemplate jdbcTemplate;
+    private DataSource dataSource;
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+    
+    public DataSource getDataSource() {
+        return dataSource;
     }
 
     private static final RowMapper<Book> BOOK_MAPPER = new RowMapper<Book>() {
@@ -100,7 +106,6 @@ public class BookManagerImpl implements BookManager {
     @Override
     @Transactional(readOnly = false)
     public void updateBook(Book book) {
-
         validate(book);
         if (book.getId() == null) {
             throw new IllegalArgumentException("book id is null");
@@ -126,14 +131,16 @@ public class BookManagerImpl implements BookManager {
     @Override
     @Transactional(readOnly = true)
     public Book findBookById(Long id) {
-        List<Book> foundBooks = jdbcTemplate.query("SELECT id,name,isbn,published FROM book WHERE id = ?", BOOK_MAPPER, id);
+        List<Book> foundBooks = jdbcTemplate.query("SELECT * FROM book WHERE id = ?", BOOK_MAPPER, id);
         if (foundBooks.size() > 1) {
             throw new ServiceFailureException(
                     "Internal error: More entities with the same id found "
                     + "(source id: " + id + ", found " + foundBooks);
         }
+        
         return foundBooks.isEmpty() ? null : foundBooks.get(0);
     }
+    
 
     @Override
     @Transactional(readOnly = true)
@@ -142,7 +149,7 @@ public class BookManagerImpl implements BookManager {
             throw new IllegalArgumentException("author is null");
         }
         return jdbcTemplate
-                .query("SELECT book.id,book.name,book.isbn,book.published "
+                .query("SELECT * "
                         + "FROM book JOIN auhor ON book.id=auhor.book_id  "
                         + "WHERE author.id = ?", BOOK_MAPPER, author.getId());
     }
@@ -151,7 +158,7 @@ public class BookManagerImpl implements BookManager {
     @Transactional(readOnly = true)
     public List<Book> findAllBooks() {
         return jdbcTemplate
-                .query("SELECT id,name,isbn,published FROM book", BOOK_MAPPER);
+                .query("SELECT * FROM book", BOOK_MAPPER);
     }
 
 }

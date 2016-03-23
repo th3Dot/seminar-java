@@ -31,6 +31,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  *
@@ -44,17 +46,7 @@ public class AuthorManagerImplTest {
     private Author authorKarel;
     private Clock clock;
     private static final String SQL_SCRIPT_NAME = "scriptDB.sql";
-
-    public AuthorManagerImplTest() {
-    }
-
-    private static DataSource prepareDataSource() throws SQLException {
-        EmbeddedDataSource ds = new EmbeddedDataSource();
-        //we will use in memory database
-        ds.setDatabaseName("memory:bookregmgr-testAuth");
-        ds.setCreateDatabase("create");
-        return ds;
-    }
+    private static final ApplicationContext CTX = new ClassPathXmlApplicationContext("spring/spring-test-context.xml");
 
     @After
     public void tearDown() throws SQLException {
@@ -71,19 +63,8 @@ public class AuthorManagerImplTest {
 
     @Before
     public void setUp() throws SQLException, FileNotFoundException {
-
-        dataSource = prepareDataSource();
-        
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.clear();
-        calendar.set(2016, Calendar.JANUARY, 1);
-        long secondsSinceEpoch = calendar.getTimeInMillis() / 1000L;
-        Instant instant = Instant.ofEpochSecond(secondsSinceEpoch);;
-        
-        clock = Clock.fixed(instant, ZoneId.of("UTC"));
-        
-        this.manager = new AuthorManagerImpl(dataSource, clock);
-
+        manager = (AuthorManagerImpl) CTX.getBean("authorManager");
+        dataSource = manager.getDataSource();
         DBUtils.executeSqlScript(dataSource,BookManager.class.getResource(SQL_SCRIPT_NAME));
 
         authorOlda = Author.builder()
