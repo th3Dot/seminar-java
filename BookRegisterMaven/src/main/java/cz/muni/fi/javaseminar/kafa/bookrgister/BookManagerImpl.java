@@ -57,20 +57,12 @@ public class BookManagerImpl implements BookManager {
         book.setId(rs.getLong("id"));
         book.setName(rs.getString("name"));
         book.setIsbn(rs.getString("isbn"));
-        //java.util.Date utilDate = new java.util.Date();
-        //java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
         
         
         Date date = rs.getDate("published");
         LocalDate localD = date.toLocalDate();
         book.setPublished(localD);
-        //sqlDate=rs.getDate("published");
-        //utilDate = sqlDate;
-        //java.util.Date newDate = sqlDate.ge;
-        
-        //book.setPublished(utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-        //book.setPublished((LocalDate) rs.getDate("published"));
-        
+         
         return book;
     }
     
@@ -112,14 +104,8 @@ public class BookManagerImpl implements BookManager {
 
             st.setString(1, book.getName());
             st.setString(2, book.getIsbn());
-            
-            //Instant instant = book.getPublished().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
-            //java.util.Date res = Date.from(instant);
-            //java.sql.Date sqlDate = new java.sql.Date(res.getTime());
-            
-            
-            //LocalDate locald = LocalDat;
-            Date date = Date.valueOf(book.getPublished()); // 
+
+            Date date = Date.valueOf(book.getPublished());
             st.setDate(3, date);
             
             int addedRows = st.executeUpdate();
@@ -151,14 +137,8 @@ public class BookManagerImpl implements BookManager {
             st.setString(1, book.getName());
             st.setString(2, book.getIsbn());
             
-            //Instant instant = book.getPublished().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
-            //java.util.Date res = Date.from(instant);
-            //java.sql.Date sqlDate = new java.sql.Date(res.getTime());
-            
             Date date = Date.valueOf(book.getPublished());
             st.setDate(3, date);
-            
-            //st.setObject(3, book.getPublished());
             st.setLong(4, book.getId());
 
             int count = st.executeUpdate();
