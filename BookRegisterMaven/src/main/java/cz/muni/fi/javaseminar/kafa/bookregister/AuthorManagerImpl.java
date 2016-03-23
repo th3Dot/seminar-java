@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cz.muni.fi.javaseminar.kafa.bookrgister;
+package cz.muni.fi.javaseminar.kafa.bookregister;
 
 import cz.muni.fi.javaseminar.kafa.common.ServiceFailureException;
 import cz.muni.fi.javaseminar.kafa.common.EntityNotFoundException;

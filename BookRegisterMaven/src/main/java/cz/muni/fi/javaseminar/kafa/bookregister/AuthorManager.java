@@ -1,4 +1,4 @@
-package cz.muni.fi.javaseminar.kafa.bookrgister;
+package cz.muni.fi.javaseminar.kafa.bookregister;
 
 import java.util.List;
 
