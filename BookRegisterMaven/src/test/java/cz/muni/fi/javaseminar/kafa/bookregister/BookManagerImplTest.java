@@ -1,17 +1,11 @@
 package cz.muni.fi.javaseminar.kafa.bookregister;
 
 import cz.muni.fi.javaseminar.kafa.common.DBUtils;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
 import javax.sql.DataSource;
-import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.derby.jdbc.EmbeddedDataSource;
-import org.apache.ibatis.jdbc.ScriptRunner;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
@@ -64,11 +58,11 @@ public class BookManagerImplTest {
         testBookISBN = "Test-ISBN";
         testBookPublishDate = LocalDate.of(2003, Month.MARCH, 1);
         //clock namockovat na localdate
-        testBook = new Book();
-        testBook.setIsbn(testBookISBN);
-        testBook.setName(testBookName);
-        testBook.setPublished(testBookPublishDate);
-
+        testBook = Book.builder()
+                .isbn(testBookISBN)
+                .name(testBookName)
+                .published(testBookPublishDate)
+                .build();
     }
 
     @After

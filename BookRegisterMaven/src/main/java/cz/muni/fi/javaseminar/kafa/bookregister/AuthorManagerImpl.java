@@ -181,13 +181,13 @@ public class AuthorManagerImpl implements AuthorManager {
     }
 
     private Author resultSetToAuthor(ResultSet rs) throws SQLException {
-        Author author = new Author();
-        author.setId(rs.getLong("id"));
-        author.setFirstname(rs.getString("firstname"));
-        author.setSurname(rs.getString("surname"));
-        author.setDescription(rs.getString("description"));
-        author.setNationality(rs.getString("nationality"));
-        
+        Author author = Author.builder()
+                .id(rs.getLong("id"))
+                .firstname(rs.getString("firstname"))
+                .surname(rs.getString("surname"))
+                .description(rs.getString("description"))
+                .nationality(rs.getString("nationality"))
+                .build();
         Date date = rs.getDate("dateofbirth");
         LocalDate localD = date.toLocalDate();
         

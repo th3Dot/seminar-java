@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -85,20 +86,21 @@ public class AuthorManagerImplTest {
 
         DBUtils.executeSqlScript(dataSource,BookManager.class.getResource(SQL_SCRIPT_NAME));
 
-        authorOlda = new Author();
-        authorOlda.setFirstname("Oldrich");
-        authorOlda.setSurname("Faldik");
-        authorOlda.setNationality("Czech");
-        authorOlda.setDescription("Novodoby autor");
-        authorOlda.setDateOfBirth(LocalDate.of(1990, 10, 20));
-
-        authorKarel = new Author();
-        authorKarel.setFirstname("Karel");
-        authorKarel.setSurname("Soukup");
-        authorKarel.setNationality("Czech");
-        authorKarel.setDescription("Stredovek");
-        authorKarel.setDateOfBirth(LocalDate.of(1450, 11, 12));
-
+        authorOlda = Author.builder()
+                .firstname("Oldrich")
+                .surname("Faldik")
+                .nationality("Czech")
+                .description("Novodoby autor")
+                .dateOfBirth(LocalDate.of(1990, Month.JANUARY, 20))
+                .build();
+        
+        authorKarel = Author.builder()
+                .firstname("Karel")
+                .surname("Soukup")
+                .nationality("Czech")
+                .description("Stredovek")
+                .dateOfBirth(LocalDate.of(1450, Month.AUGUST, 12))
+                .build();
     }
 
     /**
@@ -140,7 +142,7 @@ public class AuthorManagerImplTest {
         assertThat(authorOlda.getFirstname(), is(equalTo("Oldrich")));
         assertThat(authorOlda.getDescription(), is(equalTo("Novodoby autor")));
         assertThat(authorOlda.getNationality(), is(equalTo("Czech")));
-        assertThat(authorOlda.getDateOfBirth(), is(equalTo(LocalDate.of(1990, 10, 20))));
+        assertThat(authorOlda.getDateOfBirth(), is(LocalDate.of(1990, Month.JANUARY, 20)));
 
     }
 

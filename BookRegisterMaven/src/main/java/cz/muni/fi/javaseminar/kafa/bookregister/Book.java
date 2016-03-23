@@ -17,6 +17,72 @@ public class Book {
         return name;
     }
 
+    public static class Builder {
+
+        private Long id;
+        private String name;
+        private String isbn;
+        private LocalDate published;
+
+        private Builder() {
+        }
+
+        public Builder id(final Long value) {
+            this.id = value;
+            return this;
+        }
+
+        public Builder name(final String value) {
+            this.name = value;
+            return this;
+        }
+
+        public Builder isbn(final String value) {
+            this.isbn = value;
+            return this;
+        }
+
+        public Builder published(final LocalDate value) {
+            this.published = value;
+            return this;
+        }
+
+        public Book build() {
+            return new cz.muni.fi.javaseminar.kafa.bookregister.Book(id, name, isbn, published);
+        }
+    }
+
+    public static Book.Builder builder() {
+        return new Book.Builder();
+    }
+
+    private Book(final Long id, final String name, final String isbn, final LocalDate published) {
+        this.id = id;
+        this.name = name;
+        this.isbn = isbn;
+        this.published = published;
+    }
+
+    public Book id(final Long value) {
+        this.id = value;
+        return this;
+    }
+
+    public Book name(final String value) {
+        this.name = value;
+        return this;
+    }
+
+    public Book isbn(final String value) {
+        this.isbn = value;
+        return this;
+    }
+
+    public Book published(final LocalDate value) {
+        this.published = value;
+        return this;
+    }
+
     public void setName(String name) {
         this.name = name;
     }

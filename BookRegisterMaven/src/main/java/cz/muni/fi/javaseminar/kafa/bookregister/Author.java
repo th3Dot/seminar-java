@@ -13,11 +13,101 @@ public class Author {
     private String firstname;
     private String surname;
     private String description;
+
+    public static class Builder {
+
+        private Long id;
+        private String firstname;
+        private String surname;
+        private String description;
+        private String nationality;
+        private LocalDate dateOfBirth;
+
+        private Builder() {
+        }
+
+        public Builder id(final Long value) {
+            this.id = value;
+            return this;
+        }
+
+        public Builder firstname(final String value) {
+            this.firstname = value;
+            return this;
+        }
+
+        public Builder surname(final String value) {
+            this.surname = value;
+            return this;
+        }
+
+        public Builder description(final String value) {
+            this.description = value;
+            return this;
+        }
+
+        public Builder nationality(final String value) {
+            this.nationality = value;
+            return this;
+        }
+
+        public Builder dateOfBirth(final LocalDate value) {
+            this.dateOfBirth = value;
+            return this;
+        }
+
+        public Author build() {
+            return new cz.muni.fi.javaseminar.kafa.bookregister.Author(id, firstname, surname, description, nationality, dateOfBirth);
+        }
+    }
+
+    public static Author.Builder builder() {
+        return new Author.Builder();
+    }
+
+    private Author(final Long id, final String firstname, final String surname, final String description, final String nationality, final LocalDate dateOfBirth) {
+        this.id = id;
+        this.firstname = firstname;
+        this.surname = surname;
+        this.description = description;
+        this.nationality = nationality;
+        this.dateOfBirth = dateOfBirth;
+    }
     private String nationality;
     private LocalDate dateOfBirth;
 
     public String getFirstname() {
         return firstname;
+    }
+
+    public Author id(final Long value) {
+        this.id = value;
+        return this;
+    }
+
+    public Author firstname(final String value) {
+        this.firstname = value;
+        return this;
+    }
+
+    public Author surname(final String value) {
+        this.surname = value;
+        return this;
+    }
+
+    public Author description(final String value) {
+        this.description = value;
+        return this;
+    }
+
+    public Author nationality(final String value) {
+        this.nationality = value;
+        return this;
+    }
+
+    public Author dateOfBirth(final LocalDate value) {
+        this.dateOfBirth = value;
+        return this;
     }
 
     public void setFirstname(String firstname) {

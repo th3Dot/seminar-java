@@ -46,14 +46,12 @@ public class BookManagerImpl implements BookManager {
         }
 
         private Book resultSetToBook(ResultSet rs) throws SQLException {
-            Book book = new Book();
-            book.setId(rs.getLong("id"));
-            book.setName(rs.getString("name"));
-            book.setIsbn(rs.getString("isbn"));
-            
-            Date date = rs.getDate("published");
-            LocalDate localD = date.toLocalDate();
-            book.setPublished(localD);
+            Book book = Book.builder()
+                    .id(rs.getLong("id"))
+                    .name(rs.getString("name"))
+                    .isbn(rs.getString("isbn"))
+                    .published(rs.getDate("published").toLocalDate())
+                    .build();
 
             return book;
         }
