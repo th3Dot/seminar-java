@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +26,11 @@ import javax.sql.DataSource;
 public class AuthorManagerImpl implements AuthorManager {
 
     private final DataSource dataSource;
-
-    public AuthorManagerImpl(DataSource dataSource) {
+    private final Clock clock;
+    
+    public AuthorManagerImpl(DataSource dataSource, Clock clock) {
         this.dataSource = dataSource;
+        this.clock = clock;
     }
 
     private void validate(Author author) throws IllegalArgumentException {
@@ -35,7 +38,7 @@ public class AuthorManagerImpl implements AuthorManager {
             throw new IllegalArgumentException("author is null");
         }
 
-        if (author.getDateOfBirth().isAfter(LocalDate.now())) {
+        if (author.getDateOfBirth().isAfter(LocalDate.now(clock))) {
             throw new IllegalArgumentException("date of birth is in future");
         }
     }
