@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.util.List;
 import javax.sql.DataSource;
@@ -39,7 +40,7 @@ public class BookManagerImpl implements BookManager {
         this.dataSource = dataSource;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
-    
+
     public DataSource getDataSource() {
         return dataSource;
     }
@@ -89,17 +90,22 @@ public class BookManagerImpl implements BookManager {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         int updated = jdbcTemplate.update((Connection connection) -> {
             PreparedStatement ps
-                    = connection.prepareStatement("INSERT INTO BOOK (name,isbn,published) VALUES (?,?,?)", Statement.RETURN_GENERATED_KEYS);
+                    = connection.prepareStatement("INSERT INTO BOOK (name,isbn,published,author_id) VALUES (?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, book.getName());
             ps.setString(2, book.getIsbn());
             Date date = Date.valueOf(book.getPublished());
             ps.setDate(3, date);
+            if (book.getAuthorId() == null) {
+                ps.setNull(4, Types.BIGINT);
+            } else {
+                ps.setLong(4, book.getAuthorId());
+            }
             return ps;
         },
                 keyHolder);
-        
+
         book.setId(keyHolder.getKey().longValue());
-        
+
         DBUtils.checkUpdatesCount(updated, book, true);
     }
 
@@ -110,7 +116,7 @@ public class BookManagerImpl implements BookManager {
         if (book.getId() == null) {
             throw new IllegalArgumentException("book id is null");
         }
-        int updated = jdbcTemplate.update("UPDATE Book SET name = ?, isbn = ?, published = ? WHERE id = ?", book.getName(), book.getIsbn(), Date.valueOf(book.getPublished()), book.getId());
+        int updated = jdbcTemplate.update("UPDATE Book SET name = ?, isbn = ?, published = ?, author_id = ? WHERE id = ?", book.getName(), book.getIsbn(), Date.valueOf(book.getPublished()), book.getAuthorId(), book.getId());
         DBUtils.checkUpdatesCount(updated, book, false);
     }
 
@@ -137,10 +143,9 @@ public class BookManagerImpl implements BookManager {
                     "Internal error: More entities with the same id found "
                     + "(source id: " + id + ", found " + foundBooks);
         }
-        
+
         return foundBooks.isEmpty() ? null : foundBooks.get(0);
     }
-    
 
     @Override
     @Transactional(readOnly = true)
@@ -149,9 +154,7 @@ public class BookManagerImpl implements BookManager {
             throw new IllegalArgumentException("author is null");
         }
         return jdbcTemplate
-                .query("SELECT * "
-                        + "FROM book JOIN auhor ON book.id=auhor.book_id  "
-                        + "WHERE author.id = ?", BOOK_MAPPER, author.getId());
+                .query("SELECT * FROM book WHERE author_id = ?", BOOK_MAPPER, author.getId());
     }
 
     @Override

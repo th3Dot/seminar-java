@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
 import javax.sql.DataSource;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
@@ -27,12 +28,12 @@ public class BookManagerImplTest {
     private String testBookName;
     private String testBookISBN;
     private LocalDate testBookPublishDate;
-    private Book testBook;
+    private Book.Builder testBook;
     private DataSource dataSource;
-    
+
     private static final String SQL_SCRIPT_NAME = "scriptDB.sql";
     private static final ApplicationContext CTX = new ClassPathXmlApplicationContext("spring/spring-test-context.xml");
-    
+
     public BookManagerImplTest() {
     }
 
@@ -57,8 +58,7 @@ public class BookManagerImplTest {
         testBook = Book.builder()
                 .isbn(testBookISBN)
                 .name(testBookName)
-                .published(testBookPublishDate)
-                .build();
+                .published(testBookPublishDate);
     }
 
     @After
@@ -78,6 +78,7 @@ public class BookManagerImplTest {
      */
     @Test
     public void testCreateBook() {
+        Book testBook = this.testBook.build();
         bookManager.createBook(testBook);
         Book retrievedBook = bookManager.findBookById(testBook.getId());
         assertNotNull(retrievedBook);
@@ -90,6 +91,7 @@ public class BookManagerImplTest {
      */
     @Test
     public void testUpdateBook() {
+        Book testBook = this.testBook.build();
         String newBookName = "newBookName";
         String newBookISBN = "newISBN";
         LocalDate newBookPublished = LocalDate.of(2004, Month.AUGUST, 2);
@@ -118,12 +120,56 @@ public class BookManagerImplTest {
      */
     @Test
     public void testDeleteBook() {
+        Book testBook = this.testBook.build();
         bookManager.createBook(testBook);
         Book retrievedBook = bookManager.findBookById(testBook.getId());
         assertNotNull(retrievedBook);
         bookManager.deleteBook(testBook);
         retrievedBook = bookManager.findBookById(testBook.getId());
         assertNull(retrievedBook);
+    }
+
+    @Test
+    public void testFindAllBooks() {
+        Book testBook = this.testBook.build();
+        Book secondTestBook = this.testBook.name("Trala").isbn("123").build();
+        assertThat(bookManager.findAllBooks()).isEmpty();
+        bookManager.createBook(testBook);
+        bookManager.createBook(secondTestBook);
+
+        assertThat(bookManager.findAllBooks())
+                .usingFieldByFieldElementComparator()
+                .containsOnly(testBook, secondTestBook);
+    }
+
+    @Test
+    public void testFindBooksByAuthor() {
+        Author author = Author.builder()
+                .firstname("Franta")
+                .surname("Novak")
+                .dateOfBirth(testBookPublishDate)
+                .nationality("Czech")
+                .description("Nothing").build();
+
+        AuthorManager authorManager = (AuthorManager) CTX.getBean("authorManager");
+        authorManager.createAuthor(author);
+        
+        Book authorTestBook = testBook
+                .authorId(author.getId())
+                .build();
+        
+        bookManager.createBook(authorTestBook);
+        
+        assertThat(bookManager.findBooksByAuthor(author))
+                .containsExactly(authorTestBook);
+    }
+
+    @Test
+    public void testFindBookById() {
+        Book testBook = this.testBook.build();
+        bookManager.createBook(testBook);
+        Book retrievedBook = bookManager.findBookById(testBook.getId());
+        assertThat(retrievedBook.getId()).isEqualTo(testBook.getId());
     }
 
 }

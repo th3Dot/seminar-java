@@ -159,5 +159,6 @@ public class AuthorManagerImpl implements AuthorManager {
         }
         return foundAuthors.isEmpty() ? null : foundAuthors.get(0);
     }
-
+    
+    
 }

@@ -12,7 +12,8 @@ public class Book {
     private String name;
     private String isbn;
     private LocalDate published;
-
+    private Long authorId;
+    
     public String getName() {
         return name;
     }
@@ -23,8 +24,14 @@ public class Book {
         private String name;
         private String isbn;
         private LocalDate published;
+        private Long authorId;
 
-        private Builder() {
+        public Long getAuthorId() {
+            return authorId;
+        }
+
+        public void setAuthorId(Long authorId) {
+            this.authorId = authorId;
         }
 
         public Builder id(final Long value) {
@@ -47,8 +54,15 @@ public class Book {
             return this;
         }
 
+        public Builder authorId(final Long value) {
+            this.authorId = value;
+            return this;
+        }
+        private Builder() {
+        }
+
         public Book build() {
-            return new cz.muni.fi.javaseminar.kafa.bookregister.Book(id, name, isbn, published);
+            return new cz.muni.fi.javaseminar.kafa.bookregister.Book(id, name, isbn, published, authorId);
         }
     }
 
@@ -56,11 +70,12 @@ public class Book {
         return new Book.Builder();
     }
 
-    private Book(final Long id, final String name, final String isbn, final LocalDate published) {
+    private Book(final Long id, final String name, final String isbn, final LocalDate published, final Long authorId) {
         this.id = id;
         this.name = name;
         this.isbn = isbn;
         this.published = published;
+        this.authorId = authorId;
     }
 
     public Book id(final Long value) {
@@ -81,6 +96,14 @@ public class Book {
     public Book published(final LocalDate value) {
         this.published = value;
         return this;
+    }
+
+    public Long getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(Long authorId) {
+        this.authorId = authorId;
     }
 
     public void setName(String name) {
