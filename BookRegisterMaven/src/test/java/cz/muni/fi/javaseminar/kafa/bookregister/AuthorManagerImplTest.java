@@ -10,25 +10,11 @@ import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-import java.util.TimeZone;
 import javax.sql.DataSource;
-import org.apache.derby.jdbc.EmbeddedDataSource;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
@@ -42,8 +28,9 @@ public class AuthorManagerImplTest {
 
     private AuthorManagerImpl manager;
     private DataSource dataSource;
-    private Author authorOlda;
-    private Author authorKarel;
+    //private Author authorOlda;
+    private Author.Builder authorOlda;
+    private Author.Builder authorKarel;
     private Clock clock;
     private static final String SQL_SCRIPT_NAME = "scriptDB.sql";
     private static final ApplicationContext CTX = new ClassPathXmlApplicationContext("spring/spring-test-context.xml");
@@ -72,31 +59,33 @@ public class AuthorManagerImplTest {
                 .surname("Faldik")
                 .nationality("Czech")
                 .description("Novodoby autor")
-                .dateOfBirth(LocalDate.of(1990, Month.JANUARY, 20))
-                .build();
+                .dateOfBirth(LocalDate.of(1990, Month.JANUARY, 20));
         
         authorKarel = Author.builder()
                 .firstname("Karel")
                 .surname("Soukup")
                 .nationality("Czech")
                 .description("Stredovek")
-                .dateOfBirth(LocalDate.of(1450, Month.AUGUST, 12))
-                .build();
+                .dateOfBirth(LocalDate.of(1450, Month.AUGUST, 12));
     }
-
+    
     /**
      * Test of createAuthor method, of class AuthorManagerImpl.
      */
     @Test
     public void testCreateAuthor() {
+        Author authorOlda = this.authorOlda.build();
         manager.createAuthor(authorOlda);
-        Long authorId = authorOlda.getId();
-
-        assertThat(authorOlda.getId(), is(not(equalTo(null))));
-        Author result = manager.findAuthorById(authorId);
-        assertThat(result, is(equalTo(authorOlda)));
-
-        assertThat(result, is(not(sameInstance(authorOlda))));
+     
+        Long testAuthorId = authorOlda.getId();
+        assertThat(testAuthorId).isNotNull();
+        
+        assertThat(manager.findAuthorById(authorOlda.getId()))
+                .isNotSameAs(authorOlda)
+                .isEqualToComparingFieldByField(authorOlda);
+        
+        
+        
 
     }
 
@@ -110,20 +99,25 @@ public class AuthorManagerImplTest {
      * Test of updateAuthor method, of class AuthorManagerImpl.
      */
     @Test
-    public void testUpdateAuthor() {
-        manager.createAuthor(authorOlda);
-        Long authorId = authorOlda.getId();
-
-        authorOlda.setSurname("Novak");
-        manager.updateAuthor(authorOlda);
-
-        authorOlda = manager.findAuthorById(authorId);
-
-        assertThat(authorOlda.getSurname(), is(equalTo("Novak")));
-        assertThat(authorOlda.getFirstname(), is(equalTo("Oldrich")));
-        assertThat(authorOlda.getDescription(), is(equalTo("Novodoby autor")));
-        assertThat(authorOlda.getNationality(), is(equalTo("Czech")));
-        assertThat(authorOlda.getDateOfBirth(), is(LocalDate.of(1990, Month.JANUARY, 20)));
+    public void testUpdateAuthorSurname() {
+        
+        Author authorForUpdate = this.authorOlda.build();
+        Author anotherAuthor = this.authorKarel.build();
+        
+        manager.createAuthor(authorForUpdate);
+        manager.createAuthor(anotherAuthor);
+        
+        authorForUpdate.setSurname("Novak");
+        manager.updateAuthor(authorForUpdate);
+        
+        
+         assertThat(manager.findAuthorById(authorForUpdate.getId()))
+                .isEqualToComparingFieldByField(authorForUpdate);
+        assertThat(manager.findAuthorById(anotherAuthor.getId()))
+                .isEqualToComparingFieldByField(anotherAuthor);
+        
+        
+       
 
     }
 
@@ -132,16 +126,21 @@ public class AuthorManagerImplTest {
      */
     @Test
     public void testDeleteAuthor() {
+        Author authorOlda = this.authorOlda.build();
+        Author authorKarel = this.authorKarel.build();
+
         manager.createAuthor(authorOlda);
         manager.createAuthor(authorKarel);
 
-        assertNotNull(manager.findAuthorById(authorOlda.getId()));
-        assertNotNull(manager.findAuthorById(authorKarel.getId()));
+        assertThat(manager.findAuthorById(authorOlda.getId())).isNotNull();
+        assertThat(manager.findAuthorById(authorKarel.getId())).isNotNull();
 
         manager.deleteAuthor(authorOlda);
 
-        assertNull(manager.findAuthorById(authorOlda.getId()));
-        assertNotNull(manager.findAuthorById(authorKarel.getId()));
+        assertThat(manager.findAuthorById(authorOlda.getId())).isNull();
+        assertThat(manager.findAuthorById(authorKarel.getId())).isNotNull();
+        
+       
 
     }
 
@@ -150,14 +149,17 @@ public class AuthorManagerImplTest {
      */
     @Test
     public void testFindAllAuthors() {
+        Author authorOlda = this.authorOlda.build();
+        Author authorKarel = this.authorKarel.build();
+
+        
         manager.createAuthor(authorOlda);
         manager.createAuthor(authorKarel);
+        //List<Author> expResult = Arrays.asList(authorOlda, authorKarel);
 
-        List<Author> expResult = Arrays.asList(authorOlda, authorKarel);
+        //List<Author> result = manager.findAllAuthors();
 
-        List<Author> result = manager.findAllAuthors();
-
-        assertEquals(expResult, result);
+        assertThat(manager.findAllAuthors()).contains(authorOlda,authorKarel);
 
     }
 
@@ -166,12 +168,17 @@ public class AuthorManagerImplTest {
      */
     @Test
     public void testFindAuthorById() {
+        Author authorOlda = this.authorOlda.build();
+        Author authorKarel = this.authorKarel.build();
+
+        
         manager.createAuthor(authorOlda);
-        Long authorId = authorOlda.getId();
-
-        Author r1 = manager.findAuthorById(authorId);
-
-        assertEquals(authorOlda, r1);
+        manager.createAuthor(authorKarel);
+        
+        
+        assertThat(manager.findAuthorById(authorOlda.getId()))
+                .isNotSameAs(authorOlda)
+                .isEqualToComparingFieldByField(authorOlda);
     }
 
 }

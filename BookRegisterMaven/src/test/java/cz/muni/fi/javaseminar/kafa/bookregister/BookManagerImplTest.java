@@ -72,7 +72,9 @@ public class BookManagerImplTest {
             connection.prepareStatement("DROP TABLE BOOK").executeUpdate();
         }
     }
-
+    
+    
+    
     /**
      * Test of createBook method, of class BookManagerImpl.
      */
@@ -80,40 +82,72 @@ public class BookManagerImplTest {
     public void testCreateBook() {
         Book testBook = this.testBook.build();
         bookManager.createBook(testBook);
-        Book retrievedBook = bookManager.findBookById(testBook.getId());
-        assertNotNull(retrievedBook);
-        assertEquals(testBookName, retrievedBook.getName());
-        assertEquals(testBookPublishDate, retrievedBook.getPublished());
+        
+        Long testBookId = testBook.getId();
+        assertThat(testBookId).isNotNull();
+        
+        assertThat(bookManager.findBookById(testBook.getId()))
+                .isNotSameAs(testBook)
+                .isEqualToComparingFieldByField(testBook);
+        
     }
 
     /**
      * Test of updateBook method, of class BookManagerImpl.
      */
     @Test
-    public void testUpdateBook() {
+    public void testUpdateBookName() {
         Book testBook = this.testBook.build();
         String newBookName = "newBookName";
         String newBookISBN = "newISBN";
         LocalDate newBookPublished = LocalDate.of(2004, Month.AUGUST, 2);
         bookManager.createBook(testBook);
-        Book retrievedBook = bookManager.findBookById(testBook.getId());
-        assertNotNull(retrievedBook);
-        retrievedBook.setName(newBookName);
-        bookManager.updateBook(retrievedBook);
-        retrievedBook = null;
-        retrievedBook = bookManager.findBookById(testBook.getId());
-        assertEquals(newBookName, retrievedBook.getName());
-        retrievedBook.setIsbn(newBookISBN);
-        bookManager.updateBook(retrievedBook);
-        retrievedBook = null;
-        retrievedBook = bookManager.findBookById(testBook.getId());
-        assertEquals(newBookISBN, retrievedBook.getIsbn());
-        retrievedBook.setPublished(newBookPublished);
-        bookManager.updateBook(retrievedBook);
-        retrievedBook = null;
-        retrievedBook = bookManager.findBookById(testBook.getId());
-        assertEquals(newBookPublished, retrievedBook.getPublished());
+      
+        
+        testBook.setName(newBookName);
+        bookManager.updateBook(testBook);
+        
+        assertThat(bookManager.findBookById(testBook.getId()))
+                .isEqualToComparingFieldByField(testBook);
+               
     }
+    
+    @Test
+    public void testUpdateBookISBN() {
+        Book testBook = this.testBook.build();
+        String newBookName = "newBookName";
+        String newBookISBN = "newISBN";
+        LocalDate newBookPublished = LocalDate.of(2004, Month.AUGUST, 2);
+        bookManager.createBook(testBook);
+     
+        
+        testBook.setIsbn(newBookISBN);
+        bookManager.updateBook(testBook);
+        
+        assertThat(bookManager.findBookById(testBook.getId()))
+                .isEqualToComparingFieldByField(testBook);
+        
+    }
+    
+    @Test
+    public void testUpdateBookPublished() {
+        Book testBook = this.testBook.build();
+        String newBookName = "newBookName";
+        String newBookISBN = "newISBN";
+        LocalDate newBookPublished = LocalDate.of(2004, Month.AUGUST, 2);
+        bookManager.createBook(testBook);
+      
+        
+        testBook.setPublished(newBookPublished);
+        bookManager.updateBook(testBook);
+        
+        assertThat(bookManager.findBookById(testBook.getId()))
+                .isEqualToComparingFieldByField(testBook);
+        
+        
+        
+    }
+    
 
     /**
      * Test of deleteBook method, of class BookManagerImpl.
@@ -122,11 +156,15 @@ public class BookManagerImplTest {
     public void testDeleteBook() {
         Book testBook = this.testBook.build();
         bookManager.createBook(testBook);
-        Book retrievedBook = bookManager.findBookById(testBook.getId());
-        assertNotNull(retrievedBook);
+        
+        
+        assertThat(bookManager.findBookById(testBook.getId())).isNotNull();
+        
         bookManager.deleteBook(testBook);
-        retrievedBook = bookManager.findBookById(testBook.getId());
-        assertNull(retrievedBook);
+        
+        assertThat(bookManager.findBookById(testBook.getId())).isNull();
+        
+        
     }
 
     @Test
@@ -168,8 +206,11 @@ public class BookManagerImplTest {
     public void testFindBookById() {
         Book testBook = this.testBook.build();
         bookManager.createBook(testBook);
-        Book retrievedBook = bookManager.findBookById(testBook.getId());
-        assertThat(retrievedBook.getId()).isEqualTo(testBook.getId());
+        
+        assertThat(bookManager.findBookById(testBook.getId()))
+                .isNotSameAs(testBook)
+                .isEqualToComparingFieldByField(testBook);
+        
     }
 
 }
