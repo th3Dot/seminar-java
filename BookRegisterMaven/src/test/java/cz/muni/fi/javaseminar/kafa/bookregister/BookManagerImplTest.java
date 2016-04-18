@@ -9,9 +9,6 @@ import javax.sql.DataSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.After;
 import org.junit.AfterClass;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,6 +26,7 @@ public class BookManagerImplTest {
     private String testBookISBN;
     private LocalDate testBookPublishDate;
     private Book.Builder testBook;
+    private Author.Builder testAuthor;
     private DataSource dataSource;
 
     private static final String SQL_SCRIPT_NAME = "scriptDB.sql";
@@ -54,42 +52,53 @@ public class BookManagerImplTest {
         testBookName = "Test Book";
         testBookISBN = "Test-ISBN";
         testBookPublishDate = LocalDate.of(2003, Month.MARCH, 1);
+
+        testAuthor = Author.builder()
+                .firstname("Oldrich")
+                .surname("Faldik")
+                .nationality("Czech")
+                .description("Novodoby autor")
+                .dateOfBirth(LocalDate.of(1990, Month.JANUARY, 20));
         //clock namockovat na localdate
         testBook = Book.builder()
                 .isbn(testBookISBN)
                 .name(testBookName)
                 .published(testBookPublishDate);
+
+        Author author = this.testAuthor.build();
+        AuthorManagerImpl am = (AuthorManagerImpl) CTX.getBean("authorManager");
+        am.createAuthor(author);
+        testBook.authorId(author.getId());
+
     }
 
     @After
     public void tearDown() throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
+            connection.prepareStatement("DROP TABLE BOOK").executeUpdate();
+        }
+        try (Connection connection = dataSource.getConnection()) {
             connection.prepareStatement("DROP TABLE AUTHOR").executeUpdate();
 
         }
-        try (Connection connection = dataSource.getConnection()) {
-
-            connection.prepareStatement("DROP TABLE BOOK").executeUpdate();
-        }
     }
-    
-    
-    
+
     /**
      * Test of createBook method, of class BookManagerImpl.
      */
     @Test
     public void testCreateBook() {
         Book testBook = this.testBook.build();
+
         bookManager.createBook(testBook);
-        
+
         Long testBookId = testBook.getId();
         assertThat(testBookId).isNotNull();
-        
+
         assertThat(bookManager.findBookById(testBook.getId()))
                 .isNotSameAs(testBook)
                 .isEqualToComparingFieldByField(testBook);
-        
+
     }
 
     /**
@@ -102,16 +111,15 @@ public class BookManagerImplTest {
         String newBookISBN = "newISBN";
         LocalDate newBookPublished = LocalDate.of(2004, Month.AUGUST, 2);
         bookManager.createBook(testBook);
-      
-        
+
         testBook.setName(newBookName);
         bookManager.updateBook(testBook);
-        
+
         assertThat(bookManager.findBookById(testBook.getId()))
                 .isEqualToComparingFieldByField(testBook);
-               
+
     }
-    
+
     @Test
     public void testUpdateBookISBN() {
         Book testBook = this.testBook.build();
@@ -119,16 +127,15 @@ public class BookManagerImplTest {
         String newBookISBN = "newISBN";
         LocalDate newBookPublished = LocalDate.of(2004, Month.AUGUST, 2);
         bookManager.createBook(testBook);
-     
-        
+
         testBook.setIsbn(newBookISBN);
         bookManager.updateBook(testBook);
-        
+
         assertThat(bookManager.findBookById(testBook.getId()))
                 .isEqualToComparingFieldByField(testBook);
-        
+
     }
-    
+
     @Test
     public void testUpdateBookPublished() {
         Book testBook = this.testBook.build();
@@ -136,18 +143,14 @@ public class BookManagerImplTest {
         String newBookISBN = "newISBN";
         LocalDate newBookPublished = LocalDate.of(2004, Month.AUGUST, 2);
         bookManager.createBook(testBook);
-      
-        
+
         testBook.setPublished(newBookPublished);
         bookManager.updateBook(testBook);
-        
+
         assertThat(bookManager.findBookById(testBook.getId()))
                 .isEqualToComparingFieldByField(testBook);
-        
-        
-        
+
     }
-    
 
     /**
      * Test of deleteBook method, of class BookManagerImpl.
@@ -156,15 +159,13 @@ public class BookManagerImplTest {
     public void testDeleteBook() {
         Book testBook = this.testBook.build();
         bookManager.createBook(testBook);
-        
-        
+
         assertThat(bookManager.findBookById(testBook.getId())).isNotNull();
-        
+
         bookManager.deleteBook(testBook);
-        
+
         assertThat(bookManager.findBookById(testBook.getId())).isNull();
-        
-        
+
     }
 
     @Test
@@ -191,13 +192,13 @@ public class BookManagerImplTest {
 
         AuthorManager authorManager = (AuthorManager) CTX.getBean("authorManager");
         authorManager.createAuthor(author);
-        
+
         Book authorTestBook = testBook
                 .authorId(author.getId())
                 .build();
-        
+
         bookManager.createBook(authorTestBook);
-        
+
         assertThat(bookManager.findBooksByAuthor(author))
                 .containsExactly(authorTestBook);
     }
@@ -206,11 +207,11 @@ public class BookManagerImplTest {
     public void testFindBookById() {
         Book testBook = this.testBook.build();
         bookManager.createBook(testBook);
-        
+
         assertThat(bookManager.findBookById(testBook.getId()))
                 .isNotSameAs(testBook)
                 .isEqualToComparingFieldByField(testBook);
-        
+
     }
 
 }

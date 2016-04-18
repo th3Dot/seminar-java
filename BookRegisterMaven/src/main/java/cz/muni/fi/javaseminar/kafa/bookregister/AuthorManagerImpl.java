@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -41,20 +42,19 @@ public class AuthorManagerImpl implements AuthorManager {
         this.dataSource = dataSource;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
-    
+
     public DataSource getDataSource() {
         return dataSource;
     }
-    
+
     @Autowired
     public void setClock(Clock clock) {
         this.clock = clock;
     }
-    
+
     public Clock getClock() {
         return clock;
     }
-    
 
     private void validate(Author author) throws IllegalArgumentException {
         if (author == null) {
@@ -137,9 +137,13 @@ public class AuthorManagerImpl implements AuthorManager {
         if (author.getId() == null) {
             throw new IllegalArgumentException("author id is null");
         }
+        try {
+            int updated = jdbcTemplate.update("DELETE FROM author WHERE id=?", author.getId());
+            DBUtils.checkUpdatesCount(updated, author, false);
+        } catch (DataAccessException e) {
+            System.err.println("Could not delete author. Some book is probably assigned to him.");
+        }
 
-        int updated = jdbcTemplate.update("DELETE FROM author WHERE id=?", author.getId());
-        DBUtils.checkUpdatesCount(updated, author, false);
     }
 
     @Override
@@ -159,6 +163,5 @@ public class AuthorManagerImpl implements AuthorManager {
         }
         return foundAuthors.isEmpty() ? null : foundAuthors.get(0);
     }
-    
-    
+
 }

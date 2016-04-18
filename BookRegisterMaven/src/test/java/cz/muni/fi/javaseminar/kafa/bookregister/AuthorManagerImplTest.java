@@ -38,21 +38,20 @@ public class AuthorManagerImplTest {
     @After
     public void tearDown() throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
-            connection.prepareStatement("DROP TABLE AUTHOR").executeUpdate();
-
-        }
-        try (Connection connection = dataSource.getConnection()) {
 
             connection.prepareStatement("DROP TABLE BOOK").executeUpdate();
         }
+        try (Connection connection = dataSource.getConnection()) {
+            connection.prepareStatement("DROP TABLE AUTHOR").executeUpdate();
 
+        }
     }
 
     @Before
     public void setUp() throws SQLException, FileNotFoundException {
         manager = (AuthorManagerImpl) CTX.getBean("authorManager");
         dataSource = manager.getDataSource();
-        DBUtils.executeSqlScript(dataSource,BookManager.class.getResource(SQL_SCRIPT_NAME));
+        DBUtils.executeSqlScript(dataSource, BookManager.class.getResource(SQL_SCRIPT_NAME));
 
         authorOlda = Author.builder()
                 .firstname("Oldrich")
@@ -60,7 +59,7 @@ public class AuthorManagerImplTest {
                 .nationality("Czech")
                 .description("Novodoby autor")
                 .dateOfBirth(LocalDate.of(1990, Month.JANUARY, 20));
-        
+
         authorKarel = Author.builder()
                 .firstname("Karel")
                 .surname("Soukup")
@@ -68,7 +67,7 @@ public class AuthorManagerImplTest {
                 .description("Stredovek")
                 .dateOfBirth(LocalDate.of(1450, Month.AUGUST, 12));
     }
-    
+
     /**
      * Test of createAuthor method, of class AuthorManagerImpl.
      */
@@ -76,16 +75,13 @@ public class AuthorManagerImplTest {
     public void testCreateAuthor() {
         Author authorOlda = this.authorOlda.build();
         manager.createAuthor(authorOlda);
-     
+
         Long testAuthorId = authorOlda.getId();
         assertThat(testAuthorId).isNotNull();
-        
+
         assertThat(manager.findAuthorById(authorOlda.getId()))
                 .isNotSameAs(authorOlda)
                 .isEqualToComparingFieldByField(authorOlda);
-        
-        
-        
 
     }
 
@@ -100,24 +96,20 @@ public class AuthorManagerImplTest {
      */
     @Test
     public void testUpdateAuthorSurname() {
-        
+
         Author authorForUpdate = this.authorOlda.build();
         Author anotherAuthor = this.authorKarel.build();
-        
+
         manager.createAuthor(authorForUpdate);
         manager.createAuthor(anotherAuthor);
-        
+
         authorForUpdate.setSurname("Novak");
         manager.updateAuthor(authorForUpdate);
-        
-        
-         assertThat(manager.findAuthorById(authorForUpdate.getId()))
+
+        assertThat(manager.findAuthorById(authorForUpdate.getId()))
                 .isEqualToComparingFieldByField(authorForUpdate);
         assertThat(manager.findAuthorById(anotherAuthor.getId()))
                 .isEqualToComparingFieldByField(anotherAuthor);
-        
-        
-       
 
     }
 
@@ -139,8 +131,6 @@ public class AuthorManagerImplTest {
 
         assertThat(manager.findAuthorById(authorOlda.getId())).isNull();
         assertThat(manager.findAuthorById(authorKarel.getId())).isNotNull();
-        
-       
 
     }
 
@@ -152,14 +142,12 @@ public class AuthorManagerImplTest {
         Author authorOlda = this.authorOlda.build();
         Author authorKarel = this.authorKarel.build();
 
-        
         manager.createAuthor(authorOlda);
         manager.createAuthor(authorKarel);
         //List<Author> expResult = Arrays.asList(authorOlda, authorKarel);
 
         //List<Author> result = manager.findAllAuthors();
-
-        assertThat(manager.findAllAuthors()).contains(authorOlda,authorKarel);
+        assertThat(manager.findAllAuthors()).contains(authorOlda, authorKarel);
 
     }
 
@@ -171,11 +159,9 @@ public class AuthorManagerImplTest {
         Author authorOlda = this.authorOlda.build();
         Author authorKarel = this.authorKarel.build();
 
-        
         manager.createAuthor(authorOlda);
         manager.createAuthor(authorKarel);
-        
-        
+
         assertThat(manager.findAuthorById(authorOlda.getId()))
                 .isNotSameAs(authorOlda)
                 .isEqualToComparingFieldByField(authorOlda);

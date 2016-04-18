@@ -65,7 +65,7 @@ public class Author {
         return new Author.Builder();
     }
 
-    private Author(final Long id, final String firstname, final String surname, final String description, final String nationality, final LocalDate dateOfBirth) {
+    public Author(final Long id, final String firstname, final String surname, final String description, final String nationality, final LocalDate dateOfBirth) {
         this.id = id;
         this.firstname = firstname;
         this.surname = surname;

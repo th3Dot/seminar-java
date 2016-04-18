@@ -8,12 +8,13 @@ import java.util.Objects;
  * @author martin.kalenda, Oldrich Faldik
  */
 public class Book {
+
     private Long id;
     private String name;
     private String isbn;
     private LocalDate published;
     private Long authorId;
-    
+
     public String getName() {
         return name;
     }
@@ -58,6 +59,7 @@ public class Book {
             this.authorId = value;
             return this;
         }
+
         private Builder() {
         }
 
@@ -85,6 +87,11 @@ public class Book {
 
     public Book name(final String value) {
         this.name = value;
+        return this;
+    }
+
+    public Book authorId(final Long value) {
+        this.authorId = value;
         return this;
     }
 
@@ -129,10 +136,11 @@ public class Book {
     public Long getId() {
         return id;
     }
-    
+
     public void setId(long id) {
-        this.id=id;
+        this.id = id;
     }
+
     @Override
     public int hashCode() {
         int hash = 7;
@@ -162,7 +170,5 @@ public class Book {
         }
         return true;
     }
-
-
 
 }

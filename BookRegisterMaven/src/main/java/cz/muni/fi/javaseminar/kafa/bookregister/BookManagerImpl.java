@@ -14,7 +14,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.time.LocalDate;
 import java.util.List;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +57,7 @@ public class BookManagerImpl implements BookManager {
                     .name(rs.getString("name"))
                     .isbn(rs.getString("isbn"))
                     .published(rs.getDate("published").toLocalDate())
+                    .authorId(rs.getLong("author_id"))
                     .build();
 
             return book;
