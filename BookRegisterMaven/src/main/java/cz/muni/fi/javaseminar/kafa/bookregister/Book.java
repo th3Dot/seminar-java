@@ -72,7 +72,7 @@ public class Book {
         return new Book.Builder();
     }
 
-    private Book(final Long id, final String name, final String isbn, final LocalDate published, final Long authorId) {
+    public Book(final Long id, final String name, final String isbn, final LocalDate published, final Long authorId) {
         this.id = id;
         this.name = name;
         this.isbn = isbn;
