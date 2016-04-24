@@ -16,3 +16,4 @@ hs_err_pid*
 /BookRegisterMaven/derby.log
 /BookRegisterMaven/target
 /BookRegisterMaven/derbyDB
+/BookRegisterGUI/target
