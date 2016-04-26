@@ -60,17 +60,20 @@ public class MainWindow extends javax.swing.JFrame {
 
         authorsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
+                {"George", "Shaw", "08-20-1861", "Best of best"},
                 {null, null, null, null},
                 {null, null, null, null},
                 {null, null, null, null},
                 {null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Firstname", "Surname", "Date of Birth", "Description"
             }
         ));
+        authorsTable.setColumnSelectionAllowed(true);
         authorsTable.setMinimumSize(new java.awt.Dimension(480, 640));
         authorsScrollPane.setViewportView(authorsTable);
+        authorsTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         authorsPanel.add(authorsScrollPane, java.awt.BorderLayout.CENTER);
 
@@ -80,13 +83,14 @@ public class MainWindow extends javax.swing.JFrame {
 
         booksTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {"Pigmalion", "456128741", "10-20-1840"},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Name", "ISBN", "Published Date"
             }
         ));
         booksScrollPane.setViewportView(booksTable);
@@ -122,6 +126,11 @@ public class MainWindow extends javax.swing.JFrame {
         editMenu.setText("Edit");
 
         editAuthorMenuItem.setText("Edit existing author...");
+        editAuthorMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editAuthorMenuItemActionPerformed(evt);
+            }
+        });
         editMenu.add(editAuthorMenuItem);
 
         editBookMenuItem.setText("Edit existing book...");
@@ -140,7 +149,48 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void newAuthorMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newAuthorMenuItemActionPerformed
-        // TODO add your handling code here:
+        JFrame newAuthorWindow = new NewAuthorWindow();
+        newAuthorWindow.setVisible(true);
+        this.setEnabled(false);
+        newAuthorWindow.addWindowListener(new WindowListener() {
+
+            @Override
+            public void windowOpened(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                mainWindow.setEnabled(true);
+                e.getWindow().dispose();
+                mainWindow.toFront();
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
     }//GEN-LAST:event_newAuthorMenuItemActionPerformed
 
     private void newBookMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newBookMenuItemActionPerformed
@@ -232,6 +282,51 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
     }//GEN-LAST:event_editBookMenuItemActionPerformed
+
+    private void editAuthorMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editAuthorMenuItemActionPerformed
+       JFrame editAuthorWindow = new EditAuthorWindow();
+        editAuthorWindow.setVisible(true);
+        this.setEnabled(false);
+        editAuthorWindow.addWindowListener(new WindowListener() {
+
+            @Override
+            public void windowOpened(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                mainWindow.setEnabled(true);
+                e.getWindow().dispose();
+                mainWindow.toFront();
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+    }//GEN-LAST:event_editAuthorMenuItemActionPerformed
 
     /**
      * @param args the command line arguments
