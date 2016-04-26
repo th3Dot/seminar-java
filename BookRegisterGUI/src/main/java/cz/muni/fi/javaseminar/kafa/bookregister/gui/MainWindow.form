@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+<Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
     <Menu class="javax.swing.JMenuBar" name="mainMenuBar">
       <SubComponents>
@@ -47,6 +47,14 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editBookMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="editBookMenuItem1">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Delete selected..."/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editBookMenuItem1ActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>
@@ -116,39 +124,45 @@
             <Component class="javax.swing.JTable" name="authorsTable">
               <Properties>
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                  <Table columnCount="4" rowCount="5">
+                  <Table columnCount="5" rowCount="5">
                     <Column editable="true" title="Firstname" type="java.lang.Object">
                       <Data value="George"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
+                      <Data value="Karel"/>
+                      <Data value="V&#xed;t&#x11b;zslav"/>
+                      <Data value="Josef"/>
+                      <Data value="Ernest"/>
                     </Column>
                     <Column editable="true" title="Surname" type="java.lang.Object">
                       <Data value="Shaw"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
+                      <Data value="&#x10c;apek"/>
+                      <Data value="Nezval"/>
+                      <Data value="Sl&#xe1;dek"/>
+                      <Data value="Hemingway"/>
                     </Column>
                     <Column editable="true" title="Date of Birth" type="java.lang.Object">
                       <Data value="08-20-1861"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
+                      <Data value="01-09-1890"/>
+                      <Data value="05-26-1900"/>
+                      <Data value="05-10-1845"/>
+                      <Data value="05-22-1899"/>
                     </Column>
                     <Column editable="true" title="Description" type="java.lang.Object">
                       <Data value="Best of best"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
+                      <Data value="Czech writer"/>
+                      <Data value="Poet"/>
+                      <Data value="Poet"/>
+                      <Data value="Writer"/>
                     </Column>
+                    <Column editable="true" title="" type="java.lang.Boolean"/>
                   </Table>
                 </Property>
                 <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
-                  <TableColumnModel selectionModel="3">
+                  <TableColumnModel selectionModel="0">
+                    <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                      <Title/>
+                      <Editor/>
+                      <Renderer/>
+                    </Column>
                     <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                       <Title/>
                       <Editor/>
@@ -171,7 +185,6 @@
                     </Column>
                   </TableColumnModel>
                 </Property>
-                <Property name="columnSelectionAllowed" type="boolean" value="true"/>
                 <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[480, 640]"/>
                 </Property>
@@ -203,32 +216,38 @@
             <Component class="javax.swing.JTable" name="booksTable">
               <Properties>
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                  <Table columnCount="3" rowCount="5">
+                  <Table columnCount="4" rowCount="5">
                     <Column editable="true" title="Name" type="java.lang.Object">
                       <Data value="Pigmalion"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
+                      <Data value="Immaturity"/>
+                      <Data value="Love Among the Artists "/>
+                      <Data value="Widowers&apos; Houses "/>
+                      <Data value="The Doctor&apos;s Dilemma "/>
                     </Column>
                     <Column editable="true" title="ISBN" type="java.lang.Object">
                       <Data value="456128741"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
+                      <Data value="545353321"/>
+                      <Data value="245353213"/>
+                      <Data value="645532136"/>
+                      <Data value="645532136"/>
                     </Column>
                     <Column editable="true" title="Published Date" type="java.lang.Object">
                       <Data value="10-20-1840"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
-                      <Data value="null"/>
+                      <Data value="11-12-1929"/>
+                      <Data value="03-08-1900"/>
+                      <Data value="09-12-1898"/>
+                      <Data value="07-01-1890"/>
                     </Column>
+                    <Column editable="true" title="" type="java.lang.Boolean"/>
                   </Table>
                 </Property>
                 <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                   <TableColumnModel selectionModel="0">
+                    <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                      <Title/>
+                      <Editor/>
+                      <Renderer/>
+                    </Column>
                     <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                       <Title/>
                       <Editor/>

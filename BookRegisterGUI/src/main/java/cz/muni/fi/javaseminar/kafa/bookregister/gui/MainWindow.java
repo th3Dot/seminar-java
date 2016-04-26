@@ -46,6 +46,7 @@ public class MainWindow extends javax.swing.JFrame {
         editMenu = new javax.swing.JMenu();
         editAuthorMenuItem = new javax.swing.JMenuItem();
         editBookMenuItem = new javax.swing.JMenuItem();
+        editBookMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Book Register 1.0");
@@ -60,20 +61,26 @@ public class MainWindow extends javax.swing.JFrame {
 
         authorsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"George", "Shaw", "08-20-1861", "Best of best"},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {"George", "Shaw", "08-20-1861", "Best of best", null},
+                {"Karel", "Čapek", "01-09-1890", "Czech writer", null},
+                {"Vítězslav", "Nezval", "05-26-1900", "Poet", null},
+                {"Josef", "Sládek", "05-10-1845", "Poet", null},
+                {"Ernest", "Hemingway", "05-22-1899", "Writer", null}
             },
             new String [] {
-                "Firstname", "Surname", "Date of Birth", "Description"
+                "Firstname", "Surname", "Date of Birth", "Description", ""
             }
-        ));
-        authorsTable.setColumnSelectionAllowed(true);
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
         authorsTable.setMinimumSize(new java.awt.Dimension(480, 640));
         authorsScrollPane.setViewportView(authorsTable);
-        authorsTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         authorsPanel.add(authorsScrollPane, java.awt.BorderLayout.CENTER);
 
@@ -83,16 +90,24 @@ public class MainWindow extends javax.swing.JFrame {
 
         booksTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"Pigmalion", "456128741", "10-20-1840"},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {"Pigmalion", "456128741", "10-20-1840", null},
+                {"Immaturity", "545353321", "11-12-1929", null},
+                {"Love Among the Artists ", "245353213", "03-08-1900", null},
+                {"Widowers' Houses ", "645532136", "09-12-1898", null},
+                {"The Doctor's Dilemma ", "645532136", "07-01-1890", null}
             },
             new String [] {
-                "Name", "ISBN", "Published Date"
+                "Name", "ISBN", "Published Date", ""
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
         booksScrollPane.setViewportView(booksTable);
 
         booksPanel.add(booksScrollPane, java.awt.BorderLayout.CENTER);
@@ -140,6 +155,14 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
         editMenu.add(editBookMenuItem);
+
+        editBookMenuItem1.setText("Delete selected...");
+        editBookMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editBookMenuItem1ActionPerformed(evt);
+            }
+        });
+        editMenu.add(editBookMenuItem1);
 
         mainMenuBar.add(editMenu);
 
@@ -328,6 +351,10 @@ public class MainWindow extends javax.swing.JFrame {
         });
     }//GEN-LAST:event_editAuthorMenuItemActionPerformed
 
+    private void editBookMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBookMenuItem1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_editBookMenuItem1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -377,6 +404,7 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JTable booksTable;
     private javax.swing.JMenuItem editAuthorMenuItem;
     private javax.swing.JMenuItem editBookMenuItem;
+    private javax.swing.JMenuItem editBookMenuItem1;
     private javax.swing.JMenu editMenu;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenuBar mainMenuBar;
