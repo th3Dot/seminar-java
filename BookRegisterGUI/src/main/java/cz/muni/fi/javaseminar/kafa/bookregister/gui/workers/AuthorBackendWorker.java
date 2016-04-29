@@ -6,6 +6,10 @@
 package cz.muni.fi.javaseminar.kafa.bookregister.gui.workers;
 
 import cz.muni.fi.javaseminar.kafa.bookregister.Author;
+import java.awt.Frame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import org.springframework.dao.DataAccessException;
 
 /**
  *
@@ -31,7 +35,20 @@ public class AuthorBackendWorker extends AbstractBackendWorker {
                 authorManager.createAuthor(author);
                 break;
             case DELETE:
-                authorManager.deleteAuthor(author);
+                try {
+                    authorManager.deleteAuthor(author);
+                } catch (DataAccessException e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            JOptionPane.showMessageDialog(
+                                    Frame.getFrames()[0],
+                                    "Couldn't delete author. Probably there are some books assigned to him. Please delete them first.",
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    });
+                }
                 break;
             case UPDATE:
                 authorManager.updateAuthor(author);
