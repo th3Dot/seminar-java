@@ -24,6 +24,8 @@ public class AuthorsTableModel extends DefaultTableModel {
     private final BookManager bm;
 
     private List<Author> authors;
+    private int currentSlectedIndex;
+    private int rowCount;
 
     final private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
@@ -31,16 +33,32 @@ public class AuthorsTableModel extends DefaultTableModel {
         am = BackendService.getAuthorManager();
         bm = BackendService.getBookManager();
         authors = am.findAllAuthors();
+        rowCount = authors.size();
+    }
+
+    public int getCurrentSlectedIndex() {
+        return currentSlectedIndex;
+    }
+
+    public void setCurrentSlectedIndex(int index) {
+        currentSlectedIndex = index;
     }
 
     @Override
     public int getRowCount() {
-        return BackendService.getAuthorManager().findAllAuthors().size();
+        return rowCount;
     }
 
     @Override
     public int getColumnCount() {
-        return 4;
+        return 5;
+    }
+
+    public void updateData() {
+        authors = am.findAllAuthors();
+        rowCount = authors.size();
+        this.fireTableDataChanged();
+
     }
 
     @Override
@@ -54,6 +72,8 @@ public class AuthorsTableModel extends DefaultTableModel {
                 return "Date of Birth";
             case 3:
                 return "Description";
+            case 4:
+                return "Nationality";
             default:
                 throw new IllegalArgumentException("columnIndex");
         }
@@ -75,6 +95,9 @@ public class AuthorsTableModel extends DefaultTableModel {
             case 3:
                 author.setDescription((String) aValue);
                 break;
+            case 4:
+                author.setNationality((String) aValue);
+                break;
             default:
                 throw new IllegalArgumentException("columnIndex");
         }
@@ -95,6 +118,8 @@ public class AuthorsTableModel extends DefaultTableModel {
                 return author.getDateOfBirth();
             case 3:
                 return author.getDescription();
+            case 4:
+                return author.getNationality();
             default:
                 throw new IllegalArgumentException("columnIndex");
         }

@@ -5,10 +5,20 @@
  */
 package cz.muni.fi.javaseminar.kafa.bookregister.gui;
 
+import cz.muni.fi.javaseminar.kafa.bookregister.Author;
+import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
+import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
+import java.awt.event.WindowEvent;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import no.tornado.databinding.model.ListComboBoxModel;
+import org.jdesktop.swingx.JXDatePicker;
 
 /**
  *
@@ -16,11 +26,15 @@ import no.tornado.databinding.model.ListComboBoxModel;
  */
 public class NewAuthorWindow extends javax.swing.JFrame {
 
+    private AuthorManager am = BackendService.getAuthorManager();
+    private BookManager bm = BackendService.getBookManager();
+
     /**
      * Creates new form NewAuthorWindow
      */
     public NewAuthorWindow() {
         initComponents();
+        namePanel4.add(datePicker);
     }
 
     /**
@@ -48,10 +62,9 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         jTextField1 = new javax.swing.JTextField();
         namePanel4 = new javax.swing.JPanel();
         nameLabel4 = new javax.swing.JLabel();
-        nameTextField4 = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setResizable(false);
 
@@ -92,7 +105,6 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         nameLabel1.setPreferredSize(new java.awt.Dimension(80, 16));
         namePanel1.add(nameLabel1);
 
-        nameTextField1.setText("Boch");
         nameTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 nameTextField1ActionPerformed(evt);
@@ -138,8 +150,6 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         nameLabel3.setName(""); // NOI18N
         nameLabel3.setPreferredSize(new java.awt.Dimension(80, 16));
         namePanel3.add(nameLabel3);
-
-        jTextField1.setText("jTextField1");
         namePanel3.add(jTextField1);
 
         jPanel1.add(namePanel3);
@@ -154,25 +164,27 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         nameLabel4.setPreferredSize(new java.awt.Dimension(80, 16));
         namePanel4.add(nameLabel4);
 
-        nameTextField4.setText("08-28-1961");
-        nameTextField4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                nameTextField4ActionPerformed(evt);
-            }
-        });
-        namePanel4.add(nameTextField4);
-
         jPanel1.add(namePanel4);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         jPanel2.setLayout(new java.awt.GridLayout(1, 0));
 
-        jButton2.setText("Cancel");
-        jPanel2.add(jButton2);
-
         jButton1.setText("Create");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         jPanel2.add(jButton1);
+
+        jButton2.setText("Cancel");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton2);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
@@ -187,13 +199,21 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_nameTextField1ActionPerformed
 
-    private void nameTextField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameTextField4ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_nameTextField4ActionPerformed
-
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        Instant instant = Instant.ofEpochMilli(datePicker.getDate().getTime());
+        LocalDate date = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDate();
+        Author newAuthor = new Author(null, nameTextField.getText(), nameTextField1.getText(), jTextField1.getText(), (String) jComboBox1.getSelectedItem(), date);
+        am.createAuthor(newAuthor);
+        this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -229,7 +249,7 @@ public class NewAuthorWindow extends javax.swing.JFrame {
             }
         });
     }
-
+    private JXDatePicker datePicker = new JXDatePicker();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -249,7 +269,6 @@ public class NewAuthorWindow extends javax.swing.JFrame {
     private javax.swing.JPanel namePanel4;
     private javax.swing.JTextField nameTextField;
     private javax.swing.JTextField nameTextField1;
-    private javax.swing.JTextField nameTextField4;
     private javax.swing.JLabel windowLabel;
     // End of variables declaration//GEN-END:variables
 }

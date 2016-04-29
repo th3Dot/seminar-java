@@ -5,6 +5,7 @@
  */
 package cz.muni.fi.javaseminar.kafa.bookregister.gui;
 
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.model.AuthorsTableModel;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.model.BooksTableModel;
 import java.awt.Component;
@@ -14,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -47,9 +49,23 @@ public class MainWindow extends javax.swing.JFrame {
         selectionModel.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 DefaultListSelectionModel source = (DefaultListSelectionModel) e.getSource();
+                if (source.getMinSelectionIndex() >= 0) {
+                    authorsTableModel.setCurrentSlectedIndex(source.getMinSelectionIndex());
+                }
+
                 booksTableModel.setAuthorIndex(source.getMinSelectionIndex());
             }
         });
+    }
+
+    private void getFocusBack() {
+        this.setEnabled(true);
+        this.toFront();
+        booksTableModel.updateData();
+        authorsTableModel.updateData();
+        if (authorsTableModel.getRowCount() != 0) {
+            authorsTable.setRowSelectionInterval(authorsTableModel.getCurrentSlectedIndex(), authorsTableModel.getCurrentSlectedIndex());
+        }
     }
 
     /**
@@ -157,9 +173,8 @@ public class MainWindow extends javax.swing.JFrame {
 
             @Override
             public void windowClosing(WindowEvent e) {
-                mainWindow.setEnabled(true);
+                getFocusBack();
                 e.getWindow().dispose();
-                mainWindow.toFront();
             }
 
             @Override
@@ -185,6 +200,10 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_newAuthorMenuItemActionPerformed
 
     private void newBookMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newBookMenuItemActionPerformed
+        if (BackendService.getAuthorManager().findAllAuthors().size() == 0) {
+            JOptionPane.showMessageDialog(this, "First create some authors.");
+            return;
+        }
         JFrame newBookWindow = new NewBookWindow();
         newBookWindow.setVisible(true);
         this.setEnabled(false);
@@ -196,9 +215,8 @@ public class MainWindow extends javax.swing.JFrame {
 
             @Override
             public void windowClosing(WindowEvent e) {
-                mainWindow.setEnabled(true);
+                getFocusBack();
                 e.getWindow().dispose();
-                mainWindow.toFront();
             }
 
             @Override
@@ -257,24 +275,14 @@ public class MainWindow extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                mainWindow = new MainWindow();
+                MainWindow mainWindow = new MainWindow();
                 mainWindow.setVisible(true);
             }
         });
     }
 
-    public static void updateAuthorTable() {
-        authorsTableModel.fireTableDataChanged();
-    }
-
-    public static void updateBookTable(int index) {
-        booksTableModel.setAuthorIndex(index);
-        booksTableModel.fireTableDataChanged();
-    }
-
-    private static MainWindow mainWindow;
-    private static AuthorsTableModel authorsTableModel;
-    private static BooksTableModel booksTableModel;
+    private AuthorsTableModel authorsTableModel;
+    private BooksTableModel booksTableModel;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel authorsLabel;
     private javax.swing.JPanel authorsPanel;

@@ -89,6 +89,11 @@ public class NewBookWindow extends javax.swing.JFrame {
         buttonPanel.add(createButton);
 
         cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
         buttonPanel.add(cancelButton);
 
         getContentPane().add(buttonPanel, java.awt.BorderLayout.SOUTH);
@@ -196,7 +201,6 @@ public class NewBookWindow extends javax.swing.JFrame {
         LocalDate date = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDate();
         Book newBook = new Book(null, nameTextField.getText(), isbnTextField.getText(), date, am.findAllAuthors().get(authorComboBox.getSelectedIndex()).getId());
         bm.createBook(newBook);
-        MainWindow.updateBookTable(authorComboBox.getSelectedIndex());
         this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }//GEN-LAST:event_createButtonActionPerformed
 
@@ -207,6 +211,10 @@ public class NewBookWindow extends javax.swing.JFrame {
     private void authorComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_authorComboBoxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_authorComboBoxActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+    }//GEN-LAST:event_cancelButtonActionPerformed
 
     /**
      * @param args the command line arguments

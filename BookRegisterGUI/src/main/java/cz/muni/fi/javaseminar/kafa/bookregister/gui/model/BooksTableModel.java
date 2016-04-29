@@ -5,6 +5,7 @@
  */
 package cz.muni.fi.javaseminar.kafa.bookregister.gui.model;
 
+import cz.muni.fi.javaseminar.kafa.bookregister.Author;
 import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.Book;
 import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
@@ -25,6 +26,7 @@ public class BooksTableModel extends DefaultTableModel {
     private int rowCount;
     final private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     private List<Book> books;
+    private Author currentSelectedAuthor;
 
     public BooksTableModel() {
         am = BackendService.getAuthorManager();
@@ -33,13 +35,21 @@ public class BooksTableModel extends DefaultTableModel {
     }
 
     public void setAuthorIndex(int index) {
-        books = bm.findBooksByAuthor(am.findAllAuthors().get(index));
+        if (index >= 0) {
+            currentSelectedAuthor = am.findAllAuthors().get(index);
+        }
+
+        books = bm.findBooksByAuthor(currentSelectedAuthor);
         rowCount = books.size();
         fireTableDataChanged();
     }
 
-    public void updateData(int index) {
-        books = bm.findBooksByAuthor(am.findAllAuthors().get(index));
+    public void updateData() {
+        if (currentSelectedAuthor != null) {
+            books = bm.findBooksByAuthor(am.findAuthorById(currentSelectedAuthor.getId()));
+            rowCount = books.size();
+            this.fireTableDataChanged();
+        }
     }
 
     @Override
