@@ -44,11 +44,11 @@ public class MainWindow extends javax.swing.JFrame {
         authorsTableModel = new AuthorsTableModel();
         booksTableModel = new BooksTableModel();
         initComponents();
-        booksTable.getColumnModel().getColumn(2).setCellEditor(new DatePickerCellEditor(new SimpleDateFormat("dd-MM-yyyy")));
+        booksTable.getColumnModel().getColumn(2).setCellEditor(new DatePickerCellEditor(new SimpleDateFormat("dd. MM. yyyy")));
         booksTable.getColumnModel().getColumn(2).setCellRenderer(new DateCellRenderer());
         booksTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        authorsTable.getColumnModel().getColumn(2).setCellEditor(new DatePickerCellEditor(new SimpleDateFormat("dd-MM-yyyy")));
+        authorsTable.getColumnModel().getColumn(2).setCellEditor(new DatePickerCellEditor(new SimpleDateFormat("dd. MM. yyyy")));
         authorsTable.getColumnModel().getColumn(2).setCellRenderer(new DateCellRenderer());
         authorsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -123,7 +123,7 @@ public class MainWindow extends javax.swing.JFrame {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        int rowAtPoint = authorsTable.rowAtPoint(SwingUtilities.convertPoint(booksPopupMenu, new Point(0, 0), authorsTable));
+                        int rowAtPoint = booksTable.rowAtPoint(SwingUtilities.convertPoint(booksPopupMenu, new Point(0, 0), booksTable));
                         if (rowAtPoint > -1) {
                             booksTable.setRowSelectionInterval(rowAtPoint, rowAtPoint);
                         }
@@ -147,12 +147,11 @@ public class MainWindow extends javax.swing.JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    booksTableModel.deleteBookAtIndex(booksTable.getSelectedRow());
-
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(t, "Couldn't delete author. Reason: " + ex.getMessage());
+                if (booksTable.getSelectedRow() == -1) {
+                    JOptionPane.showMessageDialog(t, "You haven't selected any book.");
+                    return;
                 }
+                booksTableModel.deleteBookAtIndex(booksTable.getSelectedRow());
 
             }
         });
@@ -226,7 +225,6 @@ public class MainWindow extends javax.swing.JFrame {
         fileMenu.setText("File");
 
         newAuthorMenuItem.setText("New author...");
-        newAuthorMenuItem.setActionCommand("New author...");
         newAuthorMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newAuthorMenuItemActionPerformed(evt);

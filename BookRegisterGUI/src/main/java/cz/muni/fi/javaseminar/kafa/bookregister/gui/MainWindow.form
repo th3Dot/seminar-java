@@ -12,7 +12,6 @@
             <MenuItem class="javax.swing.JMenuItem" name="newAuthorMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="New author..."/>
-                <Property name="actionCommand" type="java.lang.String" value="New author..."/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="newAuthorMenuItemActionPerformed"/>
