@@ -5,6 +5,11 @@
  */
 package cz.muni.fi.javaseminar.kafa.bookregister.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import no.tornado.databinding.model.ListComboBoxModel;
+
 /**
  *
  * @author olda
@@ -40,19 +45,22 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         jComboBox1 = new javax.swing.JComboBox();
         namePanel3 = new javax.swing.JPanel();
         nameLabel3 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        jTextField1 = new javax.swing.JTextField();
         namePanel4 = new javax.swing.JPanel();
         nameLabel4 = new javax.swing.JLabel();
         nameTextField4 = new javax.swing.JTextField();
-        createButton = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setResizable(false);
 
+        jPanel1.setPreferredSize(new java.awt.Dimension(400, 250));
+        jPanel1.setLayout(new java.awt.GridLayout(6, 1));
+
         windowLabel.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         windowLabel.setText("Create new author:");
+        jPanel1.add(windowLabel);
 
         namePanel.setMaximumSize(new java.awt.Dimension(2147483647, 12));
         namePanel.setPreferredSize(new java.awt.Dimension(127, 12));
@@ -72,6 +80,8 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         });
         namePanel.add(nameTextField);
 
+        jPanel1.add(namePanel);
+
         namePanel1.setMaximumSize(new java.awt.Dimension(2147483647, 12));
         namePanel1.setPreferredSize(new java.awt.Dimension(127, 12));
         namePanel1.setLayout(new javax.swing.BoxLayout(namePanel1, javax.swing.BoxLayout.LINE_AXIS));
@@ -90,6 +100,8 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         });
         namePanel1.add(nameTextField1);
 
+        jPanel1.add(namePanel1);
+
         namePanel2.setMaximumSize(new java.awt.Dimension(2147483647, 12));
         namePanel2.setPreferredSize(new java.awt.Dimension(127, 12));
         namePanel2.setLayout(new javax.swing.BoxLayout(namePanel2, javax.swing.BoxLayout.LINE_AXIS));
@@ -100,13 +112,22 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         nameLabel2.setPreferredSize(new java.awt.Dimension(80, 16));
         namePanel2.add(nameLabel2);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        List<String> countries = new ArrayList<>();
+        String[] locales = Locale.getISOCountries();
+        for (String countryCode : locales) {
+            Locale obj = new Locale("", countryCode);
+            countries.add(obj.getDisplayCountry());
+        }
+        jComboBox1.setModel(new ListComboBoxModel(countries));
+        jComboBox1.setSelectedIndex(0);
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
             }
         });
         namePanel2.add(jComboBox1);
+
+        jPanel1.add(namePanel2);
 
         namePanel3.setMaximumSize(new java.awt.Dimension(2147483647, 12));
         namePanel3.setPreferredSize(new java.awt.Dimension(127, 12));
@@ -118,12 +139,10 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         nameLabel3.setPreferredSize(new java.awt.Dimension(80, 16));
         namePanel3.add(nameLabel3);
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jTextArea1.setText("Java expert");
-        jScrollPane1.setViewportView(jTextArea1);
+        jTextField1.setText("jTextField1");
+        namePanel3.add(jTextField1);
 
-        namePanel3.add(jScrollPane1);
+        jPanel1.add(namePanel3);
 
         namePanel4.setMaximumSize(new java.awt.Dimension(2147483647, 12));
         namePanel4.setPreferredSize(new java.awt.Dimension(127, 12));
@@ -143,81 +162,19 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         });
         namePanel4.add(nameTextField4);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(namePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(namePanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(namePanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(windowLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(namePanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(namePanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(windowLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(namePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(namePanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(namePanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(namePanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(namePanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 47, Short.MAX_VALUE)
-                .addGap(16, 16, 16))
-        );
+        jPanel1.add(namePanel4);
 
-        createButton.setText("Create");
+        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        jButton1.setText("Create");
+        jPanel2.setLayout(new java.awt.GridLayout(1, 0));
 
         jButton2.setText("Cancel");
+        jPanel2.add(jButton2);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(214, 214, 214)
-                        .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 397, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(11, Short.MAX_VALUE))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(createButton, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 106, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
-                .addContainerGap())
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(0, 221, Short.MAX_VALUE)
-                    .addComponent(createButton)
-                    .addGap(0, 221, Short.MAX_VALUE)))
-        );
+        jButton1.setText("Create");
+        jPanel2.add(jButton1);
+
+        getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -245,7 +202,7 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -274,13 +231,12 @@ public class NewAuthorWindow extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton createButton;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel nameLabel;
     private javax.swing.JLabel nameLabel1;
     private javax.swing.JLabel nameLabel2;

@@ -5,9 +5,21 @@
  */
 package cz.muni.fi.javaseminar.kafa.bookregister.gui;
 
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.model.AuthorsTableModel;
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.model.BooksTableModel;
+import java.awt.Component;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JFrame;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import org.jdesktop.swingx.table.DatePickerCellEditor;
 
 /**
  *
@@ -19,7 +31,25 @@ public class MainWindow extends javax.swing.JFrame {
      * Creates new form MainWindow
      */
     public MainWindow() {
+        authorsTableModel = new AuthorsTableModel();
+        booksTableModel = new BooksTableModel();
         initComponents();
+        booksTable.getColumnModel().getColumn(2).setCellEditor(new DatePickerCellEditor(new SimpleDateFormat("dd-MM-yyyy")));
+        booksTable.getColumnModel().getColumn(2).setCellRenderer(new DateCellRenderer());
+        booksTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        authorsTable.getColumnModel().getColumn(2).setCellEditor(new DatePickerCellEditor(new SimpleDateFormat("dd-MM-yyyy")));
+        authorsTable.getColumnModel().getColumn(2).setCellRenderer(new DateCellRenderer());
+        authorsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        ListSelectionModel selectionModel = authorsTable.getSelectionModel();
+
+        selectionModel.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                DefaultListSelectionModel source = (DefaultListSelectionModel) e.getSource();
+                booksTableModel.setAuthorIndex(source.getMinSelectionIndex());
+            }
+        });
     }
 
     /**
@@ -44,8 +74,6 @@ public class MainWindow extends javax.swing.JFrame {
         newAuthorMenuItem = new javax.swing.JMenuItem();
         newBookMenuItem = new javax.swing.JMenuItem();
         editMenu = new javax.swing.JMenu();
-        editAuthorMenuItem = new javax.swing.JMenuItem();
-        editBookMenuItem = new javax.swing.JMenuItem();
         editBookMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -59,26 +87,7 @@ public class MainWindow extends javax.swing.JFrame {
         authorsLabel.setText("Authors");
         authorsPanel.add(authorsLabel, java.awt.BorderLayout.PAGE_START);
 
-        authorsTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {"George", "Shaw", "08-20-1861", "Best of best", null},
-                {"Karel", "Čapek", "01-09-1890", "Czech writer", null},
-                {"Vítězslav", "Nezval", "05-26-1900", "Poet", null},
-                {"Josef", "Sládek", "05-10-1845", "Poet", null},
-                {"Ernest", "Hemingway", "05-22-1899", "Writer", null}
-            },
-            new String [] {
-                "Firstname", "Surname", "Date of Birth", "Description", ""
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
+        authorsTable.setModel(authorsTableModel);
         authorsTable.setMinimumSize(new java.awt.Dimension(480, 640));
         authorsScrollPane.setViewportView(authorsTable);
 
@@ -88,26 +97,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         booksPanel.setLayout(new java.awt.BorderLayout());
 
-        booksTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {"Pigmalion", "456128741", "10-20-1840", null},
-                {"Immaturity", "545353321", "11-12-1929", null},
-                {"Love Among the Artists ", "245353213", "03-08-1900", null},
-                {"Widowers' Houses ", "645532136", "09-12-1898", null},
-                {"The Doctor's Dilemma ", "645532136", "07-01-1890", null}
-            },
-            new String [] {
-                "Name", "ISBN", "Published Date", ""
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
+        booksTable.setModel(booksTableModel);
         booksScrollPane.setViewportView(booksTable);
 
         booksPanel.add(booksScrollPane, java.awt.BorderLayout.CENTER);
@@ -140,22 +130,6 @@ public class MainWindow extends javax.swing.JFrame {
 
         editMenu.setText("Edit");
 
-        editAuthorMenuItem.setText("Edit existing author...");
-        editAuthorMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editAuthorMenuItemActionPerformed(evt);
-            }
-        });
-        editMenu.add(editAuthorMenuItem);
-
-        editBookMenuItem.setText("Edit existing book...");
-        editBookMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editBookMenuItemActionPerformed(evt);
-            }
-        });
-        editMenu.add(editBookMenuItem);
-
         editBookMenuItem1.setText("Delete selected...");
         editBookMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -179,7 +153,6 @@ public class MainWindow extends javax.swing.JFrame {
 
             @Override
             public void windowOpened(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
@@ -191,27 +164,22 @@ public class MainWindow extends javax.swing.JFrame {
 
             @Override
             public void windowClosed(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
             public void windowIconified(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
             public void windowDeiconified(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
             public void windowActivated(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
             public void windowDeactivated(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         });
     }//GEN-LAST:event_newAuthorMenuItemActionPerformed
@@ -224,7 +192,6 @@ public class MainWindow extends javax.swing.JFrame {
 
             @Override
             public void windowOpened(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
@@ -236,120 +203,25 @@ public class MainWindow extends javax.swing.JFrame {
 
             @Override
             public void windowClosed(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
             public void windowIconified(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
             public void windowDeiconified(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
             public void windowActivated(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
             public void windowDeactivated(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         });
     }//GEN-LAST:event_newBookMenuItemActionPerformed
-
-    private void editBookMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBookMenuItemActionPerformed
-        JFrame editBookWindow = new EditBookWindow();
-        editBookWindow.setVisible(true);
-        this.setEnabled(false);
-        editBookWindow.addWindowListener(new WindowListener() {
-
-            @Override
-            public void windowOpened(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void windowClosing(WindowEvent e) {
-                mainWindow.setEnabled(true);
-                e.getWindow().dispose();
-                mainWindow.toFront();
-            }
-
-            @Override
-            public void windowClosed(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void windowIconified(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void windowDeiconified(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void windowActivated(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void windowDeactivated(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        });
-    }//GEN-LAST:event_editBookMenuItemActionPerformed
-
-    private void editAuthorMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editAuthorMenuItemActionPerformed
-       JFrame editAuthorWindow = new EditAuthorWindow();
-        editAuthorWindow.setVisible(true);
-        this.setEnabled(false);
-        editAuthorWindow.addWindowListener(new WindowListener() {
-
-            @Override
-            public void windowOpened(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void windowClosing(WindowEvent e) {
-                mainWindow.setEnabled(true);
-                e.getWindow().dispose();
-                mainWindow.toFront();
-            }
-
-            @Override
-            public void windowClosed(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void windowIconified(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void windowDeiconified(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void windowActivated(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void windowDeactivated(WindowEvent e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        });
-    }//GEN-LAST:event_editAuthorMenuItemActionPerformed
 
     private void editBookMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBookMenuItem1ActionPerformed
         // TODO add your handling code here:
@@ -391,8 +263,18 @@ public class MainWindow extends javax.swing.JFrame {
         });
     }
 
-    private static MainWindow mainWindow;
+    public static void updateAuthorTable() {
+        authorsTableModel.fireTableDataChanged();
+    }
 
+    public static void updateBookTable(int index) {
+        booksTableModel.setAuthorIndex(index);
+        booksTableModel.fireTableDataChanged();
+    }
+
+    private static MainWindow mainWindow;
+    private static AuthorsTableModel authorsTableModel;
+    private static BooksTableModel booksTableModel;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel authorsLabel;
     private javax.swing.JPanel authorsPanel;
@@ -402,8 +284,6 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JPanel booksPanel;
     private javax.swing.JScrollPane booksScrollPane;
     private javax.swing.JTable booksTable;
-    private javax.swing.JMenuItem editAuthorMenuItem;
-    private javax.swing.JMenuItem editBookMenuItem;
     private javax.swing.JMenuItem editBookMenuItem1;
     private javax.swing.JMenu editMenu;
     private javax.swing.JMenu fileMenu;
@@ -411,4 +291,21 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JMenuItem newAuthorMenuItem;
     private javax.swing.JMenuItem newBookMenuItem;
     // End of variables declaration//GEN-END:variables
+
+    public class DateCellRenderer extends DefaultTableCellRenderer {
+
+        @Override
+        public Component getTableCellRendererComponent(JTable jtable, Object value, boolean selected, boolean hasFocus, int row, int column) {
+
+            if (value instanceof Date) {
+
+                // You could use SimpleDateFormatter instead
+                value = new SimpleDateFormat("dd. MM. yyyy").format(value);
+
+            }
+
+            return super.getTableCellRendererComponent(jtable, value, selected, hasFocus, row, column);
+
+        }
+    }
 }

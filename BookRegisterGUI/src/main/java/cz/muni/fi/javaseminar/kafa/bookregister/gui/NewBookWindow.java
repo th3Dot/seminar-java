@@ -5,17 +5,45 @@
  */
 package cz.muni.fi.javaseminar.kafa.bookregister.gui;
 
+import cz.muni.fi.javaseminar.kafa.bookregister.Author;
+import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
+import cz.muni.fi.javaseminar.kafa.bookregister.Book;
+import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
+import java.awt.event.WindowEvent;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.stream.Collectors;
+import no.tornado.databinding.model.ListComboBoxModel;
+import org.jdesktop.swingx.JXDatePicker;
+
 /**
  *
  * @author Martin
  */
 public class NewBookWindow extends javax.swing.JFrame {
 
+    private AuthorManager am = BackendService.getAuthorManager();
+    private BookManager bm = BackendService.getBookManager();
+
     /**
      * Creates new form NewBookWindow
      */
     public NewBookWindow() {
         initComponents();
+        publishDatePanel.add(datePicker);
+        List<String> authors = am.findAllAuthors()
+                .stream().map((Author x) -> x.getFirstname() + " " + x.getSurname())
+                .collect(Collectors.toList());
+        authorComboBox.setModel(new ListComboBoxModel(authors));
+        try {
+            authorComboBox.setSelectedIndex(0);
+        } catch (IllegalArgumentException e) {
+            authorComboBox.setSelectedIndex(-1);
+        }
     }
 
     /**
@@ -40,7 +68,6 @@ public class NewBookWindow extends javax.swing.JFrame {
         isbnTextField = new javax.swing.JTextField();
         publishDatePanel = new javax.swing.JPanel();
         publishDateLabel = new javax.swing.JLabel();
-        publishDateTextField = new javax.swing.JTextField();
         authorPanel = new javax.swing.JPanel();
         authorLabel = new javax.swing.JLabel();
         authorComboBox = new javax.swing.JComboBox();
@@ -54,6 +81,11 @@ public class NewBookWindow extends javax.swing.JFrame {
         buttonPanel.setLayout(new java.awt.GridLayout(1, 2));
 
         createButton.setText("Create");
+        createButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                createButtonActionPerformed(evt);
+            }
+        });
         buttonPanel.add(createButton);
 
         cancelButton.setText("Cancel");
@@ -79,7 +111,6 @@ public class NewBookWindow extends javax.swing.JFrame {
         nameLabel.setPreferredSize(new java.awt.Dimension(80, 16));
         namePanel.add(nameLabel);
 
-        nameTextField.setText("Pigmalion");
         nameTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 nameTextFieldActionPerformed(evt);
@@ -97,7 +128,6 @@ public class NewBookWindow extends javax.swing.JFrame {
         isbnLabel.setPreferredSize(new java.awt.Dimension(80, 16));
         isbnPanel.add(isbnLabel);
 
-        isbnTextField.setText("456128741");
         isbnTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 isbnTextFieldActionPerformed(evt);
@@ -109,21 +139,22 @@ public class NewBookWindow extends javax.swing.JFrame {
 
         publishDatePanel.setMaximumSize(new java.awt.Dimension(2147483647, 12));
         publishDatePanel.setPreferredSize(new java.awt.Dimension(127, 12));
-        publishDatePanel.setLayout(new javax.swing.BoxLayout(publishDatePanel, javax.swing.BoxLayout.LINE_AXIS));
+        publishDatePanel.setLayout(new java.awt.GridLayout(1, 0));
 
         publishDateLabel.setText("Publish Date:");
         publishDateLabel.setMinimumSize(new java.awt.Dimension(100, 16));
         publishDateLabel.setName(""); // NOI18N
         publishDateLabel.setPreferredSize(new java.awt.Dimension(80, 16));
-        publishDatePanel.add(publishDateLabel);
-
-        publishDateTextField.setText("10-20-1840");
-        publishDateTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                publishDateTextFieldActionPerformed(evt);
+        publishDateLabel.addAncestorListener(new javax.swing.event.AncestorListener() {
+            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
+            }
+            public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
+                publishDateLabelAncestorAdded(evt);
+            }
+            public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
             }
         });
-        publishDatePanel.add(publishDateTextField);
+        publishDatePanel.add(publishDateLabel);
 
         atributesPanel.add(publishDatePanel);
 
@@ -138,6 +169,11 @@ public class NewBookWindow extends javax.swing.JFrame {
         authorPanel.add(authorLabel);
 
         authorComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        authorComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                authorComboBoxActionPerformed(evt);
+            }
+        });
         authorPanel.add(authorComboBox);
 
         atributesPanel.add(authorPanel);
@@ -155,9 +191,22 @@ public class NewBookWindow extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_nameTextFieldActionPerformed
 
-    private void publishDateTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_publishDateTextFieldActionPerformed
+    private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
+        Instant instant = Instant.ofEpochMilli(datePicker.getDate().getTime());
+        LocalDate date = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDate();
+        Book newBook = new Book(null, nameTextField.getText(), isbnTextField.getText(), date, am.findAllAuthors().get(authorComboBox.getSelectedIndex()).getId());
+        bm.createBook(newBook);
+        MainWindow.updateBookTable(authorComboBox.getSelectedIndex());
+        this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+    }//GEN-LAST:event_createButtonActionPerformed
+
+    private void publishDateLabelAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_publishDateLabelAncestorAdded
         // TODO add your handling code here:
-    }//GEN-LAST:event_publishDateTextFieldActionPerformed
+    }//GEN-LAST:event_publishDateLabelAncestorAdded
+
+    private void authorComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_authorComboBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_authorComboBoxActionPerformed
 
     /**
      * @param args the command line arguments
@@ -194,6 +243,7 @@ public class NewBookWindow extends javax.swing.JFrame {
         });
     }
 
+    private JXDatePicker datePicker = new JXDatePicker();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel atributesPanel;
     private javax.swing.JComboBox authorComboBox;
@@ -210,7 +260,6 @@ public class NewBookWindow extends javax.swing.JFrame {
     private javax.swing.JTextField nameTextField;
     private javax.swing.JLabel publishDateLabel;
     private javax.swing.JPanel publishDatePanel;
-    private javax.swing.JTextField publishDateTextField;
     private javax.swing.JLabel windowLabel;
     // End of variables declaration//GEN-END:variables
 }

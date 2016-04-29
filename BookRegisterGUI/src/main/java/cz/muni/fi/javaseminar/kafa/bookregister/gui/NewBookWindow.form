@@ -45,6 +45,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Create"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="createButtonActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="cancelButton">
           <Properties>
@@ -106,9 +109,6 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="nameTextField">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Pigmalion"/>
-              </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nameTextFieldActionPerformed"/>
               </Events>
@@ -132,9 +132,6 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="isbnTextField">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="456128741"/>
-              </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="isbnTextFieldActionPerformed"/>
               </Events>
@@ -151,7 +148,10 @@
             </Property>
           </Properties>
 
-          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+            <Property name="columns" type="int" value="0"/>
+            <Property name="rows" type="int" value="1"/>
+          </Layout>
           <SubComponents>
             <Component class="javax.swing.JLabel" name="publishDateLabel">
               <Properties>
@@ -164,13 +164,8 @@
                   <Dimension value="[80, 16]"/>
                 </Property>
               </Properties>
-            </Component>
-            <Component class="javax.swing.JTextField" name="publishDateTextField">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="10-20-1840"/>
-              </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="publishDateTextFieldActionPerformed"/>
+                <EventHandler event="ancestorAdded" listener="javax.swing.event.AncestorListener" parameters="javax.swing.event.AncestorEvent" handler="publishDateLabelAncestorAdded"/>
               </Events>
             </Component>
           </SubComponents>
@@ -210,6 +205,9 @@
                   </StringArray>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="authorComboBoxActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
