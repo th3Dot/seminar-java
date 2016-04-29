@@ -7,10 +7,13 @@ package cz.muni.fi.javaseminar.kafa.bookregister.gui.model;
 
 import cz.muni.fi.javaseminar.kafa.bookregister.Author;
 import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
+import cz.muni.fi.javaseminar.kafa.bookregister.Book;
 import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
@@ -26,8 +29,6 @@ public class AuthorsTableModel extends DefaultTableModel {
     private List<Author> authors;
     private int currentSlectedIndex;
     private int rowCount;
-
-    final private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     public AuthorsTableModel() {
         am = BackendService.getAuthorManager();
@@ -61,6 +62,17 @@ public class AuthorsTableModel extends DefaultTableModel {
 
     }
 
+    public void deleteAuthorAtIndex(int index) {
+        List<Book> authorsBooks = bm.findBooksByAuthor(authors.get(index));
+        if (authorsBooks.size() != 0) {
+            throw new IllegalStateException("Author have assigned books!");
+        }
+        rowCount--;
+        am.deleteAuthor(authors.get(index));
+        currentSlectedIndex = 0;
+        updateData();
+    }
+
     @Override
     public String getColumnName(int columnIndex) {
         switch (columnIndex) {
@@ -90,7 +102,12 @@ public class AuthorsTableModel extends DefaultTableModel {
                 author.setSurname((String) aValue);
                 break;
             case 2:
-                author.setDateOfBirth(LocalDate.parse((String) aValue, formatter));
+                Date date = (Date) aValue;
+                if (date == null) {
+                    author.setDateOfBirth(LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).toLocalDate());
+                    break;
+                }
+                author.setDateOfBirth(Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
                 break;
             case 3:
                 author.setDescription((String) aValue);

@@ -85,7 +85,6 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         nameLabel.setPreferredSize(new java.awt.Dimension(80, 16));
         namePanel.add(nameLabel);
 
-        nameTextField.setText("Joshua ");
         nameTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 nameTextFieldActionPerformed(evt);
@@ -204,8 +203,15 @@ public class NewAuthorWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        Instant instant = Instant.ofEpochMilli(datePicker.getDate().getTime());
-        LocalDate date = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDate();
+        Instant instant;
+        LocalDate date;
+        if (datePicker.getDate() != null) {
+            instant = Instant.ofEpochMilli(datePicker.getDate().getTime());
+            date = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDate();
+        } else {
+            date = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).toLocalDate();
+        }
+
         Author newAuthor = new Author(null, nameTextField.getText(), nameTextField1.getText(), jTextField1.getText(), (String) jComboBox1.getSelectedItem(), date);
         am.createAuthor(newAuthor);
         this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));

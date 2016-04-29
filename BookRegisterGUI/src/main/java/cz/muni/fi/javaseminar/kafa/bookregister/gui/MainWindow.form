@@ -11,7 +11,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="newAuthorMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="New author"/>
+                <Property name="text" type="java.lang.String" value="New author..."/>
                 <Property name="actionCommand" type="java.lang.String" value="New author..."/>
               </Properties>
               <Events>
@@ -24,21 +24,6 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="newBookMenuItemActionPerformed"/>
-              </Events>
-            </MenuItem>
-          </SubComponents>
-        </Menu>
-        <Menu class="javax.swing.JMenu" name="editMenu">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Edit"/>
-          </Properties>
-          <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="editBookMenuItem1">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Delete selected..."/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editBookMenuItem1ActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>

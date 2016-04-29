@@ -197,8 +197,14 @@ public class NewBookWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_nameTextFieldActionPerformed
 
     private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
-        Instant instant = Instant.ofEpochMilli(datePicker.getDate().getTime());
-        LocalDate date = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDate();
+        Instant instant;
+        LocalDate date;
+        if (datePicker.getDate() != null) {
+            instant = Instant.ofEpochMilli(datePicker.getDate().getTime());
+            date = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDate();
+        } else {
+            date = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).toLocalDate();
+        }
         Book newBook = new Book(null, nameTextField.getText(), isbnTextField.getText(), date, am.findAllAuthors().get(authorComboBox.getSelectedIndex()).getId());
         bm.createBook(newBook);
         this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));

@@ -9,17 +9,25 @@ import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.model.AuthorsTableModel;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.model.BooksTableModel;
 import java.awt.Component;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import org.jdesktop.swingx.table.DatePickerCellEditor;
 
@@ -56,6 +64,100 @@ public class MainWindow extends javax.swing.JFrame {
                 booksTableModel.setAuthorIndex(source.getMinSelectionIndex());
             }
         });
+
+        JFrame t = this;
+
+        JPopupMenu authorsPopupMenu = new JPopupMenu();
+        JMenuItem deleteItem = new JMenuItem("Delete");
+
+        authorsPopupMenu.addPopupMenuListener(new PopupMenuListener() {
+
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        int rowAtPoint = authorsTable.rowAtPoint(SwingUtilities.convertPoint(authorsPopupMenu, new Point(0, 0), authorsTable));
+                        if (rowAtPoint > -1) {
+                            authorsTable.setRowSelectionInterval(rowAtPoint, rowAtPoint);
+                            authorsTableModel.setCurrentSlectedIndex(rowAtPoint);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+        deleteItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    authorsTableModel.deleteAuthorAtIndex(authorsTable.getSelectedRow());
+
+                } catch (IllegalStateException ex) {
+                    JOptionPane.showMessageDialog(t, "Couldn't delete author. Reason: " + ex.getMessage());
+                }
+
+            }
+        });
+        authorsPopupMenu.add(deleteItem);
+        authorsTable.setComponentPopupMenu(authorsPopupMenu);
+
+        JPopupMenu booksPopupMenu = new JPopupMenu();
+        JMenuItem deleteBook = new JMenuItem("Delete");
+        booksPopupMenu.addPopupMenuListener(new PopupMenuListener() {
+
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        int rowAtPoint = authorsTable.rowAtPoint(SwingUtilities.convertPoint(booksPopupMenu, new Point(0, 0), authorsTable));
+                        if (rowAtPoint > -1) {
+                            booksTable.setRowSelectionInterval(rowAtPoint, rowAtPoint);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+        deleteBook.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    booksTableModel.deleteBookAtIndex(booksTable.getSelectedRow());
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(t, "Couldn't delete author. Reason: " + ex.getMessage());
+                }
+
+            }
+        });
+        booksPopupMenu.add(deleteBook);
+        booksTable.setComponentPopupMenu(booksPopupMenu);
     }
 
     private void getFocusBack() {
@@ -89,8 +191,6 @@ public class MainWindow extends javax.swing.JFrame {
         fileMenu = new javax.swing.JMenu();
         newAuthorMenuItem = new javax.swing.JMenuItem();
         newBookMenuItem = new javax.swing.JMenuItem();
-        editMenu = new javax.swing.JMenu();
-        editBookMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Book Register 1.0");
@@ -125,7 +225,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         fileMenu.setText("File");
 
-        newAuthorMenuItem.setText("New author");
+        newAuthorMenuItem.setText("New author...");
         newAuthorMenuItem.setActionCommand("New author...");
         newAuthorMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -143,18 +243,6 @@ public class MainWindow extends javax.swing.JFrame {
         fileMenu.add(newBookMenuItem);
 
         mainMenuBar.add(fileMenu);
-
-        editMenu.setText("Edit");
-
-        editBookMenuItem1.setText("Delete selected...");
-        editBookMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editBookMenuItem1ActionPerformed(evt);
-            }
-        });
-        editMenu.add(editBookMenuItem1);
-
-        mainMenuBar.add(editMenu);
 
         setJMenuBar(mainMenuBar);
 
@@ -241,10 +329,6 @@ public class MainWindow extends javax.swing.JFrame {
         });
     }//GEN-LAST:event_newBookMenuItemActionPerformed
 
-    private void editBookMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBookMenuItem1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_editBookMenuItem1ActionPerformed
-
     /**
      * @param args the command line arguments
      */
@@ -292,8 +376,6 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JPanel booksPanel;
     private javax.swing.JScrollPane booksScrollPane;
     private javax.swing.JTable booksTable;
-    private javax.swing.JMenuItem editBookMenuItem1;
-    private javax.swing.JMenu editMenu;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenuBar mainMenuBar;
     private javax.swing.JMenuItem newAuthorMenuItem;

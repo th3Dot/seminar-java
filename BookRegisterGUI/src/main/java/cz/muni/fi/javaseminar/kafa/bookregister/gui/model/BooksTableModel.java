@@ -10,8 +10,10 @@ import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.Book;
 import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
@@ -24,9 +26,16 @@ public class BooksTableModel extends DefaultTableModel {
     private final AuthorManager am;
     private final BookManager bm;
     private int rowCount;
-    final private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     private List<Book> books;
     private Author currentSelectedAuthor;
+
+    public Author getCurrentSelectedAuthor() {
+        return currentSelectedAuthor;
+    }
+
+    public void setCurrentSelectedAuthor(Author currentSelectedAuthor) {
+        this.currentSelectedAuthor = currentSelectedAuthor;
+    }
 
     public BooksTableModel() {
         am = BackendService.getAuthorManager();
@@ -34,13 +43,23 @@ public class BooksTableModel extends DefaultTableModel {
         rowCount = 0;
     }
 
+    public void deleteBookAtIndex(int index) {
+        bm.deleteBook(books.get(index));
+        rowCount--;
+        updateData();
+    }
+
     public void setAuthorIndex(int index) {
         if (index >= 0) {
             currentSelectedAuthor = am.findAllAuthors().get(index);
+            books = bm.findBooksByAuthor(currentSelectedAuthor);
+            rowCount = books.size();
+        } else {
+            currentSelectedAuthor = null;
+            books = null;
+            rowCount = 0;
         }
 
-        books = bm.findBooksByAuthor(currentSelectedAuthor);
-        rowCount = books.size();
         fireTableDataChanged();
     }
 
@@ -63,7 +82,12 @@ public class BooksTableModel extends DefaultTableModel {
                 book.setIsbn((String) aValue);
                 break;
             case 2:
-                book.setPublished(LocalDate.parse((String) aValue, formatter));
+                Date date = (Date) aValue;
+                if (date == null) {
+                    book.setPublished(LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).toLocalDate());
+                    break;
+                }
+                book.setPublished(Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
                 break;
             default:
                 throw new IllegalArgumentException("columnIndex");
