@@ -5,15 +5,21 @@
  */
 package cz.muni.fi.javaseminar.kafa.bookregister.gui;
 
-import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.actions.SpawnNewAuthorWindow;
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.actions.SpawnNewBookWindow;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.model.AuthorsTableModel;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.model.BooksTableModel;
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.workers.AuthorBackendWorker;
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.workers.BookBackendWorker;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.DefaultListSelectionModel;
@@ -22,8 +28,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
@@ -37,13 +45,25 @@ import org.jdesktop.swingx.table.DatePickerCellEditor;
  */
 public class MainWindow extends javax.swing.JFrame {
 
+    private final SpawnNewAuthorWindow spawnNewAuthorWindowAction = new SpawnNewAuthorWindow("New author...", this);
+    private final SpawnNewBookWindow spawnNewBookWindowAction = new SpawnNewBookWindow("New book...", this);
+
     /**
      * Creates new form MainWindow
      */
     public MainWindow() {
         authorsTableModel = new AuthorsTableModel();
         booksTableModel = new BooksTableModel();
+
         initComponents();
+
+        this.addWindowFocusListener(new WindowAdapter() {
+            @Override
+            public void windowGainedFocus(WindowEvent e) {
+                updateModel();
+            }
+        });
+
         booksTable.getColumnModel().getColumn(2).setCellEditor(new DatePickerCellEditor(new SimpleDateFormat("dd. MM. yyyy")));
         booksTable.getColumnModel().getColumn(2).setCellRenderer(new DateCellRenderer());
         booksTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -53,7 +73,6 @@ public class MainWindow extends javax.swing.JFrame {
         authorsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         ListSelectionModel selectionModel = authorsTable.getSelectionModel();
-
         selectionModel.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 DefaultListSelectionModel source = (DefaultListSelectionModel) e.getSource();
@@ -65,108 +84,25 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        JFrame t = this;
+        initPopupMenus();
 
-        JPopupMenu authorsPopupMenu = new JPopupMenu();
-        JMenuItem deleteItem = new JMenuItem("Delete");
-
-        authorsPopupMenu.addPopupMenuListener(new PopupMenuListener() {
-
-            @Override
-            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        int rowAtPoint = authorsTable.rowAtPoint(SwingUtilities.convertPoint(authorsPopupMenu, new Point(0, 0), authorsTable));
-                        if (rowAtPoint > -1) {
-                            authorsTable.setRowSelectionInterval(rowAtPoint, rowAtPoint);
-                            authorsTableModel.setCurrentSlectedIndex(rowAtPoint);
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void popupMenuCanceled(PopupMenuEvent e) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-        deleteItem.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    authorsTableModel.deleteAuthorAtIndex(authorsTable.getSelectedRow());
-
-                } catch (IllegalStateException ex) {
-                    JOptionPane.showMessageDialog(t, "Couldn't delete author. Reason: " + ex.getMessage());
-                }
-
-            }
-        });
-        authorsPopupMenu.add(deleteItem);
-        authorsTable.setComponentPopupMenu(authorsPopupMenu);
-
-        JPopupMenu booksPopupMenu = new JPopupMenu();
-        JMenuItem deleteBook = new JMenuItem("Delete");
-        booksPopupMenu.addPopupMenuListener(new PopupMenuListener() {
-
-            @Override
-            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        int rowAtPoint = booksTable.rowAtPoint(SwingUtilities.convertPoint(booksPopupMenu, new Point(0, 0), booksTable));
-                        if (rowAtPoint > -1) {
-                            booksTable.setRowSelectionInterval(rowAtPoint, rowAtPoint);
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void popupMenuCanceled(PopupMenuEvent e) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-        deleteBook.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (booksTable.getSelectedRow() == -1) {
-                    JOptionPane.showMessageDialog(t, "You haven't selected any book.");
-                    return;
-                }
-                booksTableModel.deleteBookAtIndex(booksTable.getSelectedRow());
-
-            }
-        });
-        booksPopupMenu.add(deleteBook);
-        booksTable.setComponentPopupMenu(booksPopupMenu);
+        newAuthorMenuItem.setAction(spawnNewAuthorWindowAction);
+        newBookMenuItem.setAction(spawnNewBookWindowAction);
+        newAuthorMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
+        newBookMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK));
     }
 
-    private void getFocusBack() {
-        this.setEnabled(true);
-        this.toFront();
-        booksTableModel.updateData();
+    public void updateModel() {
         authorsTableModel.updateData();
-        if (authorsTableModel.getRowCount() != 0) {
+
+        if (authorsTableModel.getRowCount() > 0) {
             authorsTable.setRowSelectionInterval(authorsTableModel.getCurrentSlectedIndex(), authorsTableModel.getCurrentSlectedIndex());
+            spawnNewBookWindowAction.setEnabled(true);
+        } else {
+            spawnNewBookWindowAction.setEnabled(false);
         }
+
+        booksTableModel.updateData();
     }
 
     /**
@@ -223,15 +159,17 @@ public class MainWindow extends javax.swing.JFrame {
         getContentPane().add(booksPanel);
 
         fileMenu.setText("File");
-
-        newAuthorMenuItem.setText("New author...");
-        newAuthorMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        fileMenu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                newAuthorMenuItemActionPerformed(evt);
+                fileMenuActionPerformed(evt);
             }
         });
+
+        newAuthorMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
+        newAuthorMenuItem.setText("New author...");
         fileMenu.add(newAuthorMenuItem);
 
+        newBookMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
         newBookMenuItem.setText("New book...");
         newBookMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -247,84 +185,12 @@ public class MainWindow extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void newAuthorMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newAuthorMenuItemActionPerformed
-        JFrame newAuthorWindow = new NewAuthorWindow();
-        newAuthorWindow.setVisible(true);
-        this.setEnabled(false);
-        newAuthorWindow.addWindowListener(new WindowListener() {
-
-            @Override
-            public void windowOpened(WindowEvent e) {
-            }
-
-            @Override
-            public void windowClosing(WindowEvent e) {
-                getFocusBack();
-                e.getWindow().dispose();
-            }
-
-            @Override
-            public void windowClosed(WindowEvent e) {
-            }
-
-            @Override
-            public void windowIconified(WindowEvent e) {
-            }
-
-            @Override
-            public void windowDeiconified(WindowEvent e) {
-            }
-
-            @Override
-            public void windowActivated(WindowEvent e) {
-            }
-
-            @Override
-            public void windowDeactivated(WindowEvent e) {
-            }
-        });
-    }//GEN-LAST:event_newAuthorMenuItemActionPerformed
+    private void fileMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileMenuActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fileMenuActionPerformed
 
     private void newBookMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newBookMenuItemActionPerformed
-        if (BackendService.getAuthorManager().findAllAuthors().size() == 0) {
-            JOptionPane.showMessageDialog(this, "First create some authors.");
-            return;
-        }
-        JFrame newBookWindow = new NewBookWindow();
-        newBookWindow.setVisible(true);
-        this.setEnabled(false);
-        newBookWindow.addWindowListener(new WindowListener() {
-
-            @Override
-            public void windowOpened(WindowEvent e) {
-            }
-
-            @Override
-            public void windowClosing(WindowEvent e) {
-                getFocusBack();
-                e.getWindow().dispose();
-            }
-
-            @Override
-            public void windowClosed(WindowEvent e) {
-            }
-
-            @Override
-            public void windowIconified(WindowEvent e) {
-            }
-
-            @Override
-            public void windowDeiconified(WindowEvent e) {
-            }
-
-            @Override
-            public void windowActivated(WindowEvent e) {
-            }
-
-            @Override
-            public void windowDeactivated(WindowEvent e) {
-            }
-        });
+        // TODO add your handling code here:
     }//GEN-LAST:event_newBookMenuItemActionPerformed
 
     /**
@@ -396,4 +262,123 @@ public class MainWindow extends javax.swing.JFrame {
 
         }
     }
+
+    private void initPopupMenus() {
+        JFrame t = this;
+
+        JPopupMenu authorsPopupMenu = new JPopupMenu();
+        JMenuItem deleteItem = new JMenuItem("Delete");
+
+        authorsPopupMenu.addPopupMenuListener(new PopupMenuListener() {
+
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        int rowAtPoint = authorsTable.rowAtPoint(SwingUtilities.convertPoint(authorsPopupMenu, new Point(0, 0), authorsTable));
+                        if (rowAtPoint > -1) {
+                            authorsTable.setRowSelectionInterval(rowAtPoint, rowAtPoint);
+                            authorsTableModel.setCurrentSlectedIndex(rowAtPoint);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+        deleteItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    AuthorBackendWorker worker = new AuthorBackendWorker(authorsTableModel.getAuthors()
+                            .get(authorsTable.getSelectedRow()), AuthorBackendWorker.Method.DELETE);
+                    worker.addPropertyChangeListener(new PropertyChangeListener() {
+
+                        @Override
+                        public void propertyChange(PropertyChangeEvent evt) {
+                            if (((SwingWorker.StateValue) evt.getNewValue()).equals(SwingWorker.StateValue.DONE)) {
+                                updateModel();
+                            }
+                        }
+
+                    });
+                    worker.execute();
+
+                } catch (IllegalStateException ex) {
+                    JOptionPane.showMessageDialog(t, "Couldn't delete author. Reason: " + ex.getMessage());
+                }
+
+            }
+        });
+        authorsPopupMenu.add(deleteItem);
+        authorsTable.setComponentPopupMenu(authorsPopupMenu);
+
+        JPopupMenu booksPopupMenu = new JPopupMenu();
+        JMenuItem deleteBook = new JMenuItem("Delete");
+        booksPopupMenu.addPopupMenuListener(new PopupMenuListener() {
+
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        int rowAtPoint = booksTable.rowAtPoint(SwingUtilities.convertPoint(booksPopupMenu, new Point(0, 0), booksTable));
+                        if (rowAtPoint > -1) {
+                            booksTable.setRowSelectionInterval(rowAtPoint, rowAtPoint);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+        deleteBook.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (booksTable.getSelectedRow() == -1) {
+                    JOptionPane.showMessageDialog(t, "You haven't selected any book.");
+                    return;
+                }
+                BookBackendWorker worker = new BookBackendWorker(booksTableModel.getBooks().get(booksTable.getSelectedRow()), BookBackendWorker.Method.DELETE);
+                worker.addPropertyChangeListener(new PropertyChangeListener() {
+
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if (((SwingWorker.StateValue) evt.getNewValue()).equals(SwingWorker.StateValue.DONE)) {
+                            updateModel();
+                        }
+                    }
+
+                });
+                worker.execute();
+
+            }
+        });
+        booksPopupMenu.add(deleteBook);
+        booksTable.setComponentPopupMenu(booksPopupMenu);
+    }
+
 }

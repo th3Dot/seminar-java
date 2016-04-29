@@ -10,11 +10,15 @@ import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.Book;
 import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.workers.BookBackendWorker;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import javax.swing.SwingWorker.StateValue;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -27,6 +31,14 @@ public class BooksTableModel extends DefaultTableModel {
     private final BookManager bm;
     private int rowCount;
     private List<Book> books;
+
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
+    }
     private Author currentSelectedAuthor;
 
     public Author getCurrentSelectedAuthor() {
@@ -41,12 +53,6 @@ public class BooksTableModel extends DefaultTableModel {
         am = BackendService.getAuthorManager();
         bm = BackendService.getBookManager();
         rowCount = 0;
-    }
-
-    public void deleteBookAtIndex(int index) {
-        bm.deleteBook(books.get(index));
-        rowCount--;
-        updateData();
     }
 
     public void setAuthorIndex(int index) {
@@ -93,8 +99,18 @@ public class BooksTableModel extends DefaultTableModel {
                 throw new IllegalArgumentException("columnIndex");
         }
 
-        bm.updateBook(book);
-        fireTableCellUpdated(rowIndex, columnIndex);
+        BookBackendWorker worker = new BookBackendWorker(book, BookBackendWorker.Method.UPDATE);
+        worker.addPropertyChangeListener(new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (((StateValue) evt.getNewValue()).equals(StateValue.DONE)) {
+                    fireTableCellUpdated(rowCount, rowCount);
+                }
+            }
+
+        });
+        worker.execute();
     }
 
     @Override

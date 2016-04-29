@@ -7,14 +7,17 @@ package cz.muni.fi.javaseminar.kafa.bookregister.gui.model;
 
 import cz.muni.fi.javaseminar.kafa.bookregister.Author;
 import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
-import cz.muni.fi.javaseminar.kafa.bookregister.Book;
 import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.workers.AuthorBackendWorker;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -29,6 +32,14 @@ public class AuthorsTableModel extends DefaultTableModel {
     private List<Author> authors;
     private int currentSlectedIndex;
     private int rowCount;
+
+    public List<Author> getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(List<Author> authors) {
+        this.authors = authors;
+    }
 
     public AuthorsTableModel() {
         am = BackendService.getAuthorManager();
@@ -58,19 +69,11 @@ public class AuthorsTableModel extends DefaultTableModel {
     public void updateData() {
         authors = am.findAllAuthors();
         rowCount = authors.size();
+        if (currentSlectedIndex > rowCount - 1) {
+            currentSlectedIndex = 0;
+        }
         this.fireTableDataChanged();
 
-    }
-
-    public void deleteAuthorAtIndex(int index) {
-        List<Book> authorsBooks = bm.findBooksByAuthor(authors.get(index));
-        if (authorsBooks.size() != 0) {
-            throw new IllegalStateException("Author have assigned books!");
-        }
-        rowCount--;
-        am.deleteAuthor(authors.get(index));
-        currentSlectedIndex = 0;
-        updateData();
     }
 
     @Override
@@ -118,8 +121,18 @@ public class AuthorsTableModel extends DefaultTableModel {
             default:
                 throw new IllegalArgumentException("columnIndex");
         }
+        AuthorBackendWorker worker = new AuthorBackendWorker(author, AuthorBackendWorker.Method.UPDATE);
+        worker.execute();
+        worker.addPropertyChangeListener(new PropertyChangeListener() {
 
-        am.updateAuthor(author);
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (((SwingWorker.StateValue) evt.getNewValue()).equals(SwingWorker.StateValue.DONE)) {
+                    fireTableCellUpdated(rowCount, rowCount);
+                }
+            }
+
+        });
         fireTableCellUpdated(rowIndex, columnIndex);
     }
 

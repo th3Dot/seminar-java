@@ -9,7 +9,10 @@ import cz.muni.fi.javaseminar.kafa.bookregister.Author;
 import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.workers.AuthorBackendWorker;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,6 +20,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import javax.swing.JFrame;
+import javax.swing.SwingWorker;
 import no.tornado.databinding.model.ListComboBoxModel;
 import org.jdesktop.swingx.JXDatePicker;
 
@@ -205,6 +210,7 @@ public class NewAuthorWindow extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         Instant instant;
         LocalDate date;
+        JFrame t = this;
         if (datePicker.getDate() != null) {
             instant = Instant.ofEpochMilli(datePicker.getDate().getTime());
             date = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDate();
@@ -213,8 +219,20 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         }
 
         Author newAuthor = new Author(null, nameTextField.getText(), nameTextField1.getText(), jTextField1.getText(), (String) jComboBox1.getSelectedItem(), date);
-        am.createAuthor(newAuthor);
-        this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+
+        AuthorBackendWorker worker = new AuthorBackendWorker(newAuthor, AuthorBackendWorker.Method.CREATE);
+        worker.addPropertyChangeListener(new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (((SwingWorker.StateValue) evt.getNewValue()).equals(SwingWorker.StateValue.DONE)) {
+                    t.dispatchEvent(new WindowEvent(t, WindowEvent.WINDOW_CLOSING));
+                }
+            }
+
+        });
+        worker.execute();
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
