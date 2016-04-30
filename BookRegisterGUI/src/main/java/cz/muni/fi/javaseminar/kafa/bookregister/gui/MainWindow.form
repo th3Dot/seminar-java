@@ -31,7 +31,7 @@
                 <Property name="text" type="java.lang.String" value="New book..."/>
               </Properties>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="newBookMenuItem.setMnemonic(KeyEvent.VK_B);&#xa;newBookMenuItem.setAction(spawnNewBookWindowAction);&#xa;newBookMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK));&#xa;&#xa;newBookMenuItem.addMouseListener(new MouseAdapter() {// MouseAdapter is empty implementation&#xa;                                            // of MouseListener&#xa;    @Override&#xa;    public void mouseClicked(MouseEvent e) {&#xa;        JMenuItem m = (JMenuItem) e.getSource();&#xa;        if (!m.isEnabled())&#xa;            JOptionPane.showMessageDialog(MainWindow.this, &quot;You have to create an author first.&quot;);&#xa;    }&#xa;});"/>
+                <AuxValue name="JavaCodeGenerator_ListenersCodePost" type="java.lang.String" value="newBookMenuItem.setMnemonic(KeyEvent.VK_B);&#xa;newBookMenuItem.setAction(spawnNewBookWindowAction);&#xa;newBookMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK));&#xa;&#xa;newBookMenuItem.addMouseListener(new MouseAdapter() {&#xa;    @Override&#xa;    public void mouseClicked(MouseEvent e) {&#xa;        JMenuItem m = (JMenuItem) e.getSource();&#xa;        if (!m.isEnabled())&#xa;            JOptionPane.showMessageDialog(MainWindow.this, &quot;You have to create an author first.&quot;);&#xa;    }&#xa;});"/>
               </AuxValues>
             </MenuItem>
           </SubComponents>

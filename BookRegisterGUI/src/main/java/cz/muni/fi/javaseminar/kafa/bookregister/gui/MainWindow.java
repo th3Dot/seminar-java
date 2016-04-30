@@ -313,8 +313,7 @@ public class MainWindow extends javax.swing.JFrame {
         newBookMenuItem.setAction(spawnNewBookWindowAction);
         newBookMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK));
 
-        newBookMenuItem.addMouseListener(new MouseAdapter() {// MouseAdapter is empty implementation
-            // of MouseListener
+        newBookMenuItem.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 JMenuItem m = (JMenuItem) e.getSource();
