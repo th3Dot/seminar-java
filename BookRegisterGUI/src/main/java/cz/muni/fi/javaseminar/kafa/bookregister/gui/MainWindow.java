@@ -16,6 +16,8 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -23,7 +25,6 @@ import java.beans.PropertyChangeListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -47,14 +48,13 @@ public class MainWindow extends javax.swing.JFrame {
 
     private final SpawnNewAuthorWindow spawnNewAuthorWindowAction = new SpawnNewAuthorWindow("New author...", this);
     private final SpawnNewBookWindow spawnNewBookWindowAction = new SpawnNewBookWindow("New book...", this);
+    private AuthorsTableModel authorsTableModel;
+    private BooksTableModel booksTableModel;
 
     /**
      * Creates new form MainWindow
      */
     public MainWindow() {
-        authorsTableModel = new AuthorsTableModel();
-        booksTableModel = new BooksTableModel();
-
         initComponents();
 
         this.addWindowFocusListener(new WindowAdapter() {
@@ -64,32 +64,8 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        booksTable.getColumnModel().getColumn(2).setCellEditor(new DatePickerCellEditor(new SimpleDateFormat("dd. MM. yyyy")));
-        booksTable.getColumnModel().getColumn(2).setCellRenderer(new DateCellRenderer());
-        booksTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        authorsTable.getColumnModel().getColumn(2).setCellEditor(new DatePickerCellEditor(new SimpleDateFormat("dd. MM. yyyy")));
-        authorsTable.getColumnModel().getColumn(2).setCellRenderer(new DateCellRenderer());
-        authorsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        ListSelectionModel selectionModel = authorsTable.getSelectionModel();
-        selectionModel.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                DefaultListSelectionModel source = (DefaultListSelectionModel) e.getSource();
-                if (source.getMinSelectionIndex() >= 0) {
-                    authorsTableModel.setCurrentSlectedIndex(source.getMinSelectionIndex());
-                }
-
-                booksTableModel.setAuthorIndex(source.getMinSelectionIndex());
-            }
-        });
-
-        initPopupMenus();
-
-        newAuthorMenuItem.setAction(spawnNewAuthorWindowAction);
-        newBookMenuItem.setAction(spawnNewBookWindowAction);
-        newAuthorMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
-        newBookMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK));
+        this.getRootPane().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK), "NEW_AUTHOR");
+        this.getRootPane().getActionMap().put("NEW_AUTHOR", spawnNewAuthorWindowAction);
     }
 
     public void updateModel() {
@@ -138,134 +114,41 @@ public class MainWindow extends javax.swing.JFrame {
         authorsLabel.setText("Authors");
         authorsPanel.add(authorsLabel, java.awt.BorderLayout.PAGE_START);
 
+        authorsTableModel = new AuthorsTableModel();
         authorsTable.setModel(authorsTableModel);
         authorsTable.setMinimumSize(new java.awt.Dimension(480, 640));
         authorsScrollPane.setViewportView(authorsTable);
+        authorsTable.getColumnModel().getColumn(2).setCellEditor(new DatePickerCellEditor(new SimpleDateFormat("dd. MM. yyyy")));
+        authorsTable.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
 
-        authorsPanel.add(authorsScrollPane, java.awt.BorderLayout.CENTER);
+            @Override
+            public Component getTableCellRendererComponent(JTable jtable, Object value, boolean selected, boolean hasFocus, int row, int column) {
 
-        getContentPane().add(authorsPanel);
+                if (value instanceof Date) {
 
-        booksPanel.setLayout(new java.awt.BorderLayout());
+                    // You could use SimpleDateFormatter instead
+                    value = new SimpleDateFormat("dd. MM. yyyy").format(value);
 
-        booksTable.setModel(booksTableModel);
-        booksScrollPane.setViewportView(booksTable);
-
-        booksPanel.add(booksScrollPane, java.awt.BorderLayout.CENTER);
-
-        booksLabel.setText("Books");
-        booksPanel.add(booksLabel, java.awt.BorderLayout.PAGE_START);
-
-        getContentPane().add(booksPanel);
-
-        fileMenu.setText("File");
-        fileMenu.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fileMenuActionPerformed(evt);
-            }
-        });
-
-        newAuthorMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
-        newAuthorMenuItem.setText("New author...");
-        fileMenu.add(newAuthorMenuItem);
-
-        newBookMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
-        newBookMenuItem.setText("New book...");
-        newBookMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                newBookMenuItemActionPerformed(evt);
-            }
-        });
-        fileMenu.add(newBookMenuItem);
-
-        mainMenuBar.add(fileMenu);
-
-        setJMenuBar(mainMenuBar);
-
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
-
-    private void fileMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileMenuActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_fileMenuActionPerformed
-
-    private void newBookMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newBookMenuItemActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_newBookMenuItemActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
                 }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                MainWindow mainWindow = new MainWindow();
-                mainWindow.setVisible(true);
+                return super.getTableCellRendererComponent(jtable, value, selected, hasFocus, row, column);
+
             }
         });
-    }
 
-    private AuthorsTableModel authorsTableModel;
-    private BooksTableModel booksTableModel;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel authorsLabel;
-    private javax.swing.JPanel authorsPanel;
-    private javax.swing.JScrollPane authorsScrollPane;
-    private javax.swing.JTable authorsTable;
-    private javax.swing.JLabel booksLabel;
-    private javax.swing.JPanel booksPanel;
-    private javax.swing.JScrollPane booksScrollPane;
-    private javax.swing.JTable booksTable;
-    private javax.swing.JMenu fileMenu;
-    private javax.swing.JMenuBar mainMenuBar;
-    private javax.swing.JMenuItem newAuthorMenuItem;
-    private javax.swing.JMenuItem newBookMenuItem;
-    // End of variables declaration//GEN-END:variables
+        authorsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-    public class DateCellRenderer extends DefaultTableCellRenderer {
+        ListSelectionModel selectionModel = authorsTable.getSelectionModel();
+        selectionModel.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                DefaultListSelectionModel source = (DefaultListSelectionModel) e.getSource();
+                if (source.getMinSelectionIndex() >= 0) {
+                    authorsTableModel.setCurrentSlectedIndex(source.getMinSelectionIndex());
+                }
 
-        @Override
-        public Component getTableCellRendererComponent(JTable jtable, Object value, boolean selected, boolean hasFocus, int row, int column) {
-
-            if (value instanceof Date) {
-
-                // You could use SimpleDateFormatter instead
-                value = new SimpleDateFormat("dd. MM. yyyy").format(value);
-
+                booksTableModel.setAuthorIndex(source.getMinSelectionIndex());
             }
-
-            return super.getTableCellRendererComponent(jtable, value, selected, hasFocus, row, column);
-
-        }
-    }
-
-    private void initPopupMenus() {
-        JFrame t = this;
-
+        });
         JPopupMenu authorsPopupMenu = new JPopupMenu();
         JMenuItem deleteItem = new JMenuItem("Delete");
 
@@ -303,7 +186,7 @@ public class MainWindow extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     AuthorBackendWorker worker = new AuthorBackendWorker(authorsTableModel.getAuthors()
-                            .get(authorsTable.getSelectedRow()), AuthorBackendWorker.Method.DELETE);
+                        .get(authorsTable.getSelectedRow()), AuthorBackendWorker.Method.DELETE);
                     worker.addPropertyChangeListener(new PropertyChangeListener() {
 
                         @Override
@@ -317,13 +200,41 @@ public class MainWindow extends javax.swing.JFrame {
                     worker.execute();
 
                 } catch (IllegalStateException ex) {
-                    JOptionPane.showMessageDialog(t, "Couldn't delete author. Reason: " + ex.getMessage());
+                    JOptionPane.showMessageDialog(MainWindow.this, "Couldn't delete author. Reason: " + ex.getMessage());
                 }
 
             }
         });
         authorsPopupMenu.add(deleteItem);
         authorsTable.setComponentPopupMenu(authorsPopupMenu);
+
+        authorsPanel.add(authorsScrollPane, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(authorsPanel);
+
+        booksPanel.setLayout(new java.awt.BorderLayout());
+
+        booksTableModel = new BooksTableModel();
+        booksTable.setModel(booksTableModel);
+        booksScrollPane.setViewportView(booksTable);
+        booksTable.getColumnModel().getColumn(2).setCellEditor(new DatePickerCellEditor(new SimpleDateFormat("dd. MM. yyyy")));
+        booksTable.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
+
+            @Override
+            public Component getTableCellRendererComponent(JTable jtable, Object value, boolean selected, boolean hasFocus, int row, int column) {
+
+                if (value instanceof Date) {
+
+                    // You could use SimpleDateFormatter instead
+                    value = new SimpleDateFormat("dd. MM. yyyy").format(value);
+
+                }
+
+                return super.getTableCellRendererComponent(jtable, value, selected, hasFocus, row, column);
+
+            }
+        });
+        booksTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JPopupMenu booksPopupMenu = new JPopupMenu();
         JMenuItem deleteBook = new JMenuItem("Delete");
@@ -359,7 +270,7 @@ public class MainWindow extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (booksTable.getSelectedRow() == -1) {
-                    JOptionPane.showMessageDialog(t, "You haven't selected any book.");
+                    JOptionPane.showMessageDialog(MainWindow.this, "You haven't selected any book.");
                     return;
                 }
                 BookBackendWorker worker = new BookBackendWorker(booksTableModel.getBooks().get(booksTable.getSelectedRow()), BookBackendWorker.Method.DELETE);
@@ -379,6 +290,98 @@ public class MainWindow extends javax.swing.JFrame {
         });
         booksPopupMenu.add(deleteBook);
         booksTable.setComponentPopupMenu(booksPopupMenu);
+
+        booksPanel.add(booksScrollPane, java.awt.BorderLayout.CENTER);
+
+        booksLabel.setText("Books");
+        booksPanel.add(booksLabel, java.awt.BorderLayout.PAGE_START);
+
+        getContentPane().add(booksPanel);
+
+        fileMenu.setText("File");
+
+        newAuthorMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
+        newAuthorMenuItem.setText("New author...");
+        newAuthorMenuItem.setMnemonic(KeyEvent.VK_N);
+        newAuthorMenuItem.setAction(spawnNewAuthorWindowAction);
+        newAuthorMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
+        fileMenu.add(newAuthorMenuItem);
+
+        newBookMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
+        newBookMenuItem.setText("New book...");
+        newBookMenuItem.setMnemonic(KeyEvent.VK_B);
+        newBookMenuItem.setAction(spawnNewBookWindowAction);
+        newBookMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK));
+
+        newBookMenuItem.addMouseListener(new MouseAdapter() {// MouseAdapter is empty implementation
+            // of MouseListener
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JMenuItem m = (JMenuItem) e.getSource();
+                if (!m.isEnabled())
+                JOptionPane.showMessageDialog(MainWindow.this, "You have to create an author first.");
+            }
+        });
+        fileMenu.add(newBookMenuItem);
+
+        fileMenu.setMnemonic(KeyEvent.VK_F);
+
+        mainMenuBar.add(fileMenu);
+
+        setJMenuBar(mainMenuBar);
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                MainWindow mainWindow = new MainWindow();
+                mainWindow.setVisible(true);
+            }
+        });
     }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel authorsLabel;
+    private javax.swing.JPanel authorsPanel;
+    private javax.swing.JScrollPane authorsScrollPane;
+    private javax.swing.JTable authorsTable;
+    private javax.swing.JLabel booksLabel;
+    private javax.swing.JPanel booksPanel;
+    private javax.swing.JScrollPane booksScrollPane;
+    private javax.swing.JTable booksTable;
+    private javax.swing.JMenu fileMenu;
+    private javax.swing.JMenuBar mainMenuBar;
+    private javax.swing.JMenuItem newAuthorMenuItem;
+    private javax.swing.JMenuItem newBookMenuItem;
+    // End of variables declaration//GEN-END:variables
 
 }
