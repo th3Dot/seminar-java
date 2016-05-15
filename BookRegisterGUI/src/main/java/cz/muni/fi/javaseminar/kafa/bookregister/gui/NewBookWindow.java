@@ -78,14 +78,14 @@ public class NewBookWindow extends javax.swing.JFrame {
         authorComboBox = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("New Book");
         setAlwaysOnTop(true);
         setPreferredSize(new java.awt.Dimension(400, 250));
         setResizable(false);
 
         buttonPanel.setLayout(new java.awt.GridLayout(1, 2));
 
-        createButton.setText("Create");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle"); // NOI18N
+        createButton.setText(bundle.getString("NewBook.create")); // NOI18N
         createButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 createButtonActionPerformed(evt);
@@ -93,7 +93,7 @@ public class NewBookWindow extends javax.swing.JFrame {
         });
         buttonPanel.add(createButton);
 
-        cancelButton.setText("Cancel");
+        cancelButton.setText(bundle.getString("NewBook.cancel")); // NOI18N
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
@@ -108,14 +108,14 @@ public class NewBookWindow extends javax.swing.JFrame {
         atributesPanel.setLayout(new java.awt.GridLayout(6, 1));
 
         windowLabel.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        windowLabel.setText("Create new book:");
+        windowLabel.setText(bundle.getString("NewBook.title")); // NOI18N
         atributesPanel.add(windowLabel);
 
         namePanel.setMaximumSize(new java.awt.Dimension(2147483647, 12));
         namePanel.setPreferredSize(new java.awt.Dimension(127, 12));
         namePanel.setLayout(new javax.swing.BoxLayout(namePanel, javax.swing.BoxLayout.LINE_AXIS));
 
-        nameLabel.setText("Name:");
+        nameLabel.setText(bundle.getString("NewBook.name")); // NOI18N
         nameLabel.setMinimumSize(new java.awt.Dimension(100, 16));
         nameLabel.setName(""); // NOI18N
         nameLabel.setPreferredSize(new java.awt.Dimension(80, 16));
@@ -132,7 +132,7 @@ public class NewBookWindow extends javax.swing.JFrame {
 
         isbnPanel.setLayout(new javax.swing.BoxLayout(isbnPanel, javax.swing.BoxLayout.LINE_AXIS));
 
-        isbnLabel.setText("ISBN:");
+        isbnLabel.setText(bundle.getString("NewBook.ISBN")); // NOI18N
         isbnLabel.setMinimumSize(new java.awt.Dimension(100, 16));
         isbnLabel.setName(""); // NOI18N
         isbnLabel.setPreferredSize(new java.awt.Dimension(80, 16));
@@ -151,7 +151,7 @@ public class NewBookWindow extends javax.swing.JFrame {
         publishDatePanel.setPreferredSize(new java.awt.Dimension(127, 12));
         publishDatePanel.setLayout(new java.awt.GridLayout(1, 0));
 
-        publishDateLabel.setText("Publish Date:");
+        publishDateLabel.setText(bundle.getString("NewBook.publishDate")); // NOI18N
         publishDateLabel.setMinimumSize(new java.awt.Dimension(100, 16));
         publishDateLabel.setName(""); // NOI18N
         publishDateLabel.setPreferredSize(new java.awt.Dimension(80, 16));
@@ -172,7 +172,7 @@ public class NewBookWindow extends javax.swing.JFrame {
         authorPanel.setPreferredSize(new java.awt.Dimension(127, 12));
         authorPanel.setLayout(new javax.swing.BoxLayout(authorPanel, javax.swing.BoxLayout.LINE_AXIS));
 
-        authorLabel.setText("Author:");
+        authorLabel.setText(bundle.getString("NewBook.author")); // NOI18N
         authorLabel.setMinimumSize(new java.awt.Dimension(100, 16));
         authorLabel.setName(""); // NOI18N
         authorLabel.setPreferredSize(new java.awt.Dimension(80, 16));

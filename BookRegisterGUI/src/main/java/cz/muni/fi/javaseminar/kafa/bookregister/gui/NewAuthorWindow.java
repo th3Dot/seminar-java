@@ -77,14 +77,15 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         jPanel1.setLayout(new java.awt.GridLayout(6, 1));
 
         windowLabel.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        windowLabel.setText("Create new author:");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle"); // NOI18N
+        windowLabel.setText(bundle.getString("NewAuthor.title")); // NOI18N
         jPanel1.add(windowLabel);
 
         namePanel.setMaximumSize(new java.awt.Dimension(2147483647, 12));
         namePanel.setPreferredSize(new java.awt.Dimension(127, 12));
         namePanel.setLayout(new javax.swing.BoxLayout(namePanel, javax.swing.BoxLayout.LINE_AXIS));
 
-        nameLabel.setText("Firstname:");
+        nameLabel.setText(bundle.getString("NewAuthor.firstname")); // NOI18N
         nameLabel.setMinimumSize(new java.awt.Dimension(100, 16));
         nameLabel.setName(""); // NOI18N
         nameLabel.setPreferredSize(new java.awt.Dimension(80, 16));
@@ -103,7 +104,7 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         namePanel1.setPreferredSize(new java.awt.Dimension(127, 12));
         namePanel1.setLayout(new javax.swing.BoxLayout(namePanel1, javax.swing.BoxLayout.LINE_AXIS));
 
-        nameLabel1.setText("Surname:");
+        nameLabel1.setText(bundle.getString("NewAuthor.surname")); // NOI18N
         nameLabel1.setMinimumSize(new java.awt.Dimension(100, 16));
         nameLabel1.setName(""); // NOI18N
         nameLabel1.setPreferredSize(new java.awt.Dimension(80, 16));
@@ -122,7 +123,7 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         namePanel2.setPreferredSize(new java.awt.Dimension(127, 12));
         namePanel2.setLayout(new javax.swing.BoxLayout(namePanel2, javax.swing.BoxLayout.LINE_AXIS));
 
-        nameLabel2.setText("Nationality:");
+        nameLabel2.setText(bundle.getString("NewAuthor.nationality")); // NOI18N
         nameLabel2.setMinimumSize(new java.awt.Dimension(100, 16));
         nameLabel2.setName(""); // NOI18N
         nameLabel2.setPreferredSize(new java.awt.Dimension(80, 16));
@@ -149,7 +150,7 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         namePanel3.setPreferredSize(new java.awt.Dimension(127, 12));
         namePanel3.setLayout(new javax.swing.BoxLayout(namePanel3, javax.swing.BoxLayout.LINE_AXIS));
 
-        nameLabel3.setText("Description:");
+        nameLabel3.setText(bundle.getString("NewAuthor.description")); // NOI18N
         nameLabel3.setMinimumSize(new java.awt.Dimension(100, 16));
         nameLabel3.setName(""); // NOI18N
         nameLabel3.setPreferredSize(new java.awt.Dimension(80, 16));
@@ -162,7 +163,7 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         namePanel4.setPreferredSize(new java.awt.Dimension(127, 12));
         namePanel4.setLayout(new javax.swing.BoxLayout(namePanel4, javax.swing.BoxLayout.LINE_AXIS));
 
-        nameLabel4.setText("Date of Birth:");
+        nameLabel4.setText(bundle.getString("NewAuthor.dateOfBirth")); // NOI18N
         nameLabel4.setMinimumSize(new java.awt.Dimension(100, 16));
         nameLabel4.setName(""); // NOI18N
         nameLabel4.setPreferredSize(new java.awt.Dimension(80, 16));
@@ -174,7 +175,7 @@ public class NewAuthorWindow extends javax.swing.JFrame {
 
         jPanel2.setLayout(new java.awt.GridLayout(1, 0));
 
-        jButton1.setText("Create");
+        jButton1.setText(bundle.getString("NewAuthor.create")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -182,7 +183,7 @@ public class NewAuthorWindow extends javax.swing.JFrame {
         });
         jPanel2.add(jButton1);
 
-        jButton2.setText("Cancel");
+        jButton2.setText(bundle.getString("NewAuthor.cancel")); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);

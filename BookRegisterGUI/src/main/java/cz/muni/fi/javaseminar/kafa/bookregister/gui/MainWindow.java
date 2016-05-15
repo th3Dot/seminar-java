@@ -46,8 +46,8 @@ import org.jdesktop.swingx.table.DatePickerCellEditor;
  */
 public class MainWindow extends javax.swing.JFrame {
 
-    private final SpawnNewAuthorWindow spawnNewAuthorWindowAction = new SpawnNewAuthorWindow("New author...", this);
-    private final SpawnNewBookWindow spawnNewBookWindowAction = new SpawnNewBookWindow("New book...", this);
+    private final SpawnNewAuthorWindow spawnNewAuthorWindowAction = new SpawnNewAuthorWindow(java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle").getString("Menu.file.newAuthor"), this);
+    private final SpawnNewBookWindow spawnNewBookWindowAction = new SpawnNewBookWindow(java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle").getString("Menu.file.newBook"), this);
     private AuthorsTableModel authorsTableModel;
     private BooksTableModel booksTableModel;
 
@@ -111,7 +111,8 @@ public class MainWindow extends javax.swing.JFrame {
 
         authorsPanel.setLayout(new java.awt.BorderLayout());
 
-        authorsLabel.setText("Authors");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle"); // NOI18N
+        authorsLabel.setText(bundle.getString("Table.authors.title")); // NOI18N
         authorsPanel.add(authorsLabel, java.awt.BorderLayout.PAGE_START);
 
         authorsTableModel = new AuthorsTableModel();
@@ -293,22 +294,22 @@ public class MainWindow extends javax.swing.JFrame {
 
         booksPanel.add(booksScrollPane, java.awt.BorderLayout.CENTER);
 
-        booksLabel.setText("Books");
+        booksLabel.setText(bundle.getString("Table.books.title")); // NOI18N
         booksPanel.add(booksLabel, java.awt.BorderLayout.PAGE_START);
 
         getContentPane().add(booksPanel);
 
-        fileMenu.setText("File");
+        fileMenu.setText(bundle.getString("Menu.file")); // NOI18N
 
         newAuthorMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
-        newAuthorMenuItem.setText("New author...");
+        newAuthorMenuItem.setText(bundle.getString("Menu.file.newAuthor")); // NOI18N
         newAuthorMenuItem.setMnemonic(KeyEvent.VK_N);
         newAuthorMenuItem.setAction(spawnNewAuthorWindowAction);
         newAuthorMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
         fileMenu.add(newAuthorMenuItem);
 
         newBookMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
-        newBookMenuItem.setText("New book...");
+        newBookMenuItem.setText(bundle.getString("Menu.file.newBook")); // NOI18N
         newBookMenuItem.setMnemonic(KeyEvent.VK_B);
         newBookMenuItem.setAction(spawnNewBookWindowAction);
         newBookMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK));

@@ -127,11 +127,11 @@ public class BooksTableModel extends DefaultTableModel {
     public String getColumnName(int columnIndex) {
         switch (columnIndex) {
             case 0:
-                return "Name";
+                return java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle").getString("Table.books.name");
             case 1:
-                return "ISBN";
+                return java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle").getString("Table.books.ISBN");
             case 2:
-                return "Publish Date";
+                return java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle").getString("Table.books.publishDate");
             default:
                 throw new IllegalArgumentException("columnIndex");
         }

@@ -80,15 +80,15 @@ public class AuthorsTableModel extends DefaultTableModel {
     public String getColumnName(int columnIndex) {
         switch (columnIndex) {
             case 0:
-                return "Fistname";
+                return java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle").getString("Table.authors.firstname");
             case 1:
-                return "Surname";
+                return java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle").getString("Table.authors.surname");
             case 2:
-                return "Date of Birth";
+                return java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle").getString("Table.authors.dateOfBirth");
             case 3:
-                return "Description";
+                return java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle").getString("Table.authors.description");
             case 4:
-                return "Nationality";
+                return java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle").getString("Table.authors.nationality");
             default:
                 throw new IllegalArgumentException("columnIndex");
         }
