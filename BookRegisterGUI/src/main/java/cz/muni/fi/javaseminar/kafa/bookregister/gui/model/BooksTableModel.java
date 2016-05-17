@@ -21,6 +21,8 @@ import java.util.List;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.table.DefaultTableModel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  *
  * @author Martin
@@ -31,6 +33,8 @@ public class BooksTableModel extends DefaultTableModel {
     private final BookManager bm;
     private int rowCount;
     private List<Book> books;
+    
+    private final static Logger log = LoggerFactory.getLogger(BooksTableModel.class);
 
     public List<Book> getBooks() {
         return books;
@@ -53,6 +57,7 @@ public class BooksTableModel extends DefaultTableModel {
         am = BackendService.getAuthorManager();
         bm = BackendService.getBookManager();
         rowCount = 0;
+        log.debug("inicializing BookTableModel");
     }
 
     public void setAuthorIndex(int index) {
@@ -60,10 +65,12 @@ public class BooksTableModel extends DefaultTableModel {
             currentSelectedAuthor = am.findAllAuthors().get(index);
             books = bm.findBooksByAuthor(currentSelectedAuthor);
             rowCount = books.size();
+            
         } else {
             currentSelectedAuthor = null;
             books = null;
             rowCount = 0;
+            
         }
 
         fireTableDataChanged();
@@ -96,6 +103,7 @@ public class BooksTableModel extends DefaultTableModel {
                 book.setPublished(Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
                 break;
             default:
+                log.error("Unknown columnIndex in method setValueAt (BookTableModel)");
                 throw new IllegalArgumentException("columnIndex");
         }
 

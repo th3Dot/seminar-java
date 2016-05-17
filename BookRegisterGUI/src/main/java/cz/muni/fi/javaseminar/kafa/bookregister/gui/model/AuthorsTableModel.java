@@ -20,6 +20,8 @@ import java.util.List;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  *
  * @author Martin
@@ -32,6 +34,8 @@ public class AuthorsTableModel extends DefaultTableModel {
     private List<Author> authors;
     private int currentSlectedIndex;
     private int rowCount;
+    
+    private final static Logger log = LoggerFactory.getLogger(AuthorsTableModel.class);
 
     public List<Author> getAuthors() {
         return authors;
@@ -46,6 +50,7 @@ public class AuthorsTableModel extends DefaultTableModel {
         bm = BackendService.getBookManager();
         authors = am.findAllAuthors();
         rowCount = authors.size();
+        log.debug("inicializing AuthorsTableModel");
     }
 
     public int getCurrentSlectedIndex() {
@@ -90,6 +95,7 @@ public class AuthorsTableModel extends DefaultTableModel {
             case 4:
                 return java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle").getString("Table.authors.nationality");
             default:
+                log.error("Unknown columnIndex in method getColumnName (AuthorsTableModel)");
                 throw new IllegalArgumentException("columnIndex");
         }
     }
@@ -119,6 +125,7 @@ public class AuthorsTableModel extends DefaultTableModel {
                 author.setNationality((String) aValue);
                 break;
             default:
+                log.error("Unknown columnIndex in method setValueAt (AuthorsTableModel)");
                 throw new IllegalArgumentException("columnIndex");
         }
         AuthorBackendWorker worker = new AuthorBackendWorker(author, AuthorBackendWorker.Method.UPDATE);
@@ -151,6 +158,7 @@ public class AuthorsTableModel extends DefaultTableModel {
             case 4:
                 return author.getNationality();
             default:
+                log.error("Unknown columnIndex in method getValueAt (AuthorsTableModel)");
                 throw new IllegalArgumentException("columnIndex");
         }
     }

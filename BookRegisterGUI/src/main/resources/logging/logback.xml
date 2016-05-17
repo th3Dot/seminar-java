@@ -1,0 +1,38 @@
+<!-- configuration for logback http://logback.qos.ch/ -->
+<configuration>
+    <!-- logs to console -->
+    <if condition='isDefined("catalina.base")'>
+        <then>
+            <appender name="APP" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>${catalina.base}/logs/${CONTEXT_NAME}.log</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <fileNamePattern>${catalina.base}/logs/${CONTEXT_NAME}.log.%d{yyyy-MM-dd}</fileNamePattern>
+                </rollingPolicy>
+                <encoder>
+                    <!-- http://logback.qos.ch/manual/layouts.html#conversionWord -->
+                    <pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </then>
+        <else>
+            <appender name="APP" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder>
+                    <pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </else>
+    </if>
+
+    <!-- default logging level -->
+    <root level="info">
+        <!-- reference to the used appender -->
+        <appender-ref ref="APP"/>
+    </root>
+
+    <!-- list of logger prefixes with non-default logging levels -->
+    <logger name="cz" level="warn"/>
+    <logger name="cz.muni.fi.javaseminar.kafa.bookregister.gui" level="info"/>
+    <logger name="cz.muni.fi.javaseminar.kafa.bookregister.gui.model" level="debug"/>
+    <logger name="cz.muni.fi.javaseminar.kafa.bookregister.gui.workers" level="debug"/>
+    <logger name="cz.muni.fi.javaseminar.kafa.bookregister.gui.backend" level="debug"/>
+</configuration>

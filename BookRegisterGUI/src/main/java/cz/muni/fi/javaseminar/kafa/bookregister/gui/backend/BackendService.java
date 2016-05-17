@@ -14,6 +14,8 @@ import javax.sql.DataSource;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
 /**
  *
  * @author Martin
@@ -27,6 +29,10 @@ public final class BackendService {
 
     private static final ApplicationContext CTX = new ClassPathXmlApplicationContext("spring/spring-context.xml");
 
+    private final static Logger log = LoggerFactory.getLogger(BackendService.class);
+    
+   
+    
     private BackendService() {
     }
 
@@ -35,6 +41,8 @@ public final class BackendService {
             dataSource = CTX.getBean(DataSource.class);
             bookManager = new BookManagerImpl();
             bookManager.setDataSource(dataSource);
+            log.info("Inicializing BookManager");
+            
         }
         return bookManager;
     }
@@ -45,6 +53,7 @@ public final class BackendService {
             authorManager = new AuthorManagerImpl();
             authorManager.setClock(Clock.systemDefaultZone());
             authorManager.setDataSource(dataSource);
+            log.info("Inicializing AuthorManager");
         }
         return authorManager;
     }
