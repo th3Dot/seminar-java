@@ -8,11 +8,13 @@ package cz.muni.fi.javaseminar.kafa.bookregister.gui.model;
 import cz.muni.fi.javaseminar.kafa.bookregister.Author;
 import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
+import java.awt.Frame;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import org.slf4j.Logger;
@@ -157,6 +159,7 @@ public class AuthorsTableModel extends DefaultTableModel {
                 try {
                     get();
                 } catch (Exception e) {
+                    JOptionPane.showMessageDialog(Frame.getFrames()[0], "Can't update author: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     log.error("There was an exception thrown during update of author: " + author.getFirstname() + " " + author.getSurname(), e);
                 }
                 log.debug("Updating authors table in GUI based on newly fetched data.");
