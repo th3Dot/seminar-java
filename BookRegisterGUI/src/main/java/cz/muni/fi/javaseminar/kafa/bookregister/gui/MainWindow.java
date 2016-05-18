@@ -7,13 +7,13 @@ package cz.muni.fi.javaseminar.kafa.bookregister.gui;
 
 import cz.muni.fi.javaseminar.kafa.bookregister.Author;
 import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
+import cz.muni.fi.javaseminar.kafa.bookregister.Book;
 import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.actions.SpawnNewAuthorWindow;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.actions.SpawnNewBookWindow;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.model.AuthorsTableModel;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.model.BooksTableModel;
-import cz.muni.fi.javaseminar.kafa.bookregister.gui.workers.BookBackendWorker;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -23,8 +23,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.DefaultListSelectionModel;
@@ -54,6 +52,14 @@ public class MainWindow extends javax.swing.JFrame {
     private final SpawnNewAuthorWindow spawnNewAuthorWindowAction = new SpawnNewAuthorWindow(java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle").getString("Menu.file.newAuthor"), this);
     private final SpawnNewBookWindow spawnNewBookWindowAction = new SpawnNewBookWindow(java.util.ResourceBundle.getBundle("cz/muni/fi/javaseminar/kafa/bookregister/gui/Bundle").getString("Menu.file.newBook"), this);
     private AuthorsTableModel authorsTableModel;
+
+    public AuthorsTableModel getAuthorsTableModel() {
+        return authorsTableModel;
+    }
+
+    public BooksTableModel getBooksTableModel() {
+        return booksTableModel;
+    }
     private BooksTableModel booksTableModel;
 
     public BookManager getBookManager() {
@@ -94,7 +100,7 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void initTableModels() {
         authorsTableModel = new AuthorsTableModel(authorManager, bookManager);
-        booksTableModel = new BooksTableModel();
+        booksTableModel = new BooksTableModel(authorManager, bookManager);
     }
 
     private void initBooksTable() {
@@ -154,18 +160,30 @@ public class MainWindow extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(MainWindow.this, "You haven't selected any book.");
                     return;
                 }
-                BookBackendWorker worker = new BookBackendWorker(booksTableModel.getBooks().get(booksTable.getSelectedRow()), BookBackendWorker.Method.DELETE);
-                worker.addPropertyChangeListener(new PropertyChangeListener() {
+                Book book = booksTableModel.getBooks().get(booksTable.getSelectedRow());
+                new SwingWorker<Void, Void>() {
 
                     @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        if (((SwingWorker.StateValue) evt.getNewValue()).equals(SwingWorker.StateValue.DONE)) {
-                            updateModel();
-                        }
+                    protected Void doInBackground() throws Exception {
+                        log.debug("Deleting book: " + book.getName() + " from database.");
+                        bookManager.deleteBook(book);
+                        return null;
                     }
 
-                });
-                worker.execute();
+                    @Override
+                    protected void done() {
+                        try {
+                            get();
+                        } catch (Exception e) {
+                            log.error("There was an exception thrown while deleting a book.", e);
+                            return;
+                        }
+
+                        updateModel();
+                    }
+
+                }.
+                        execute();
 
             }
         });
@@ -270,16 +288,16 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
         deleteItem.addActionListener(new ActionListener() {
+            private Author author;
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 new SwingWorker<Void, Void>() {
-                    private Author author;
 
                     @Override
                     protected Void doInBackground() throws Exception {
                         author = authorsTableModel.getAuthors().get(authorsTable.getSelectedRow());
-                        log.debug("Deleting author: " + author.getFirstname() + " " + author.getSurname());
+                        log.debug("Deleting author: " + author.getFirstname() + " " + author.getSurname() + " from database.");
                         authorManager.deleteAuthor(author);
 
                         return null;
@@ -291,7 +309,7 @@ public class MainWindow extends javax.swing.JFrame {
                             get();
                         } catch (Exception e) {
                             log.error("There was an exception thrown during deletion author: " + author.getFirstname() + " " + author.getSurname(), e);
-                            JOptionPane.showMessageDialog(MainWindow.this, "Couldn't delete author. Reason: " + e.getMessage());
+                            JOptionPane.showMessageDialog(MainWindow.this, "Couldn't delete author. Probably there are still some books assigned to him.");
                             return;
                         }
 
@@ -306,14 +324,6 @@ public class MainWindow extends javax.swing.JFrame {
 
     public void updateModel() {
         authorsTableModel.updateData();
-
-        if (authorsTableModel.getRowCount() > 0) {
-            authorsTable.setRowSelectionInterval(authorsTableModel.getCurrentSlectedIndex(), authorsTableModel.getCurrentSlectedIndex());
-            spawnNewBookWindowAction.setEnabled(true);
-        } else {
-            spawnNewBookWindowAction.setEnabled(false);
-        }
-
         booksTableModel.updateData();
     }
 

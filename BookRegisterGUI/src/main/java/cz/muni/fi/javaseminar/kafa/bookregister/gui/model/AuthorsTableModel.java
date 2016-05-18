@@ -42,7 +42,6 @@ public class AuthorsTableModel extends DefaultTableModel {
     }
 
     public AuthorsTableModel(AuthorManager authorManager, BookManager bookManager) {
-        log.debug("inicializing AuthorsTableModel");
         am = authorManager;
         bm = bookManager;
     }
@@ -72,10 +71,6 @@ public class AuthorsTableModel extends DefaultTableModel {
             protected Void doInBackground() throws Exception {
                 log.debug("Fetching new data for AuthorsTableModel from database.");
                 authors = am.findAllAuthors();
-                rowCount = authors.size();
-                if (currentSlectedIndex > rowCount - 1) {
-                    currentSlectedIndex = 0;
-                }
                 return null;
             }
 
@@ -88,7 +83,12 @@ public class AuthorsTableModel extends DefaultTableModel {
                     return;
                 }
 
-                log.debug("Updating table based on newly fetched data.");
+                rowCount = authors.size();
+                if (currentSlectedIndex > rowCount - 1) {
+                    currentSlectedIndex = 0;
+                }
+
+                log.debug("Updating authors table in GUI based on newly fetched data.");
                 fireTableDataChanged();
             }
 
@@ -146,7 +146,7 @@ public class AuthorsTableModel extends DefaultTableModel {
         new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
-                log.debug("Updating author on: " + author.getFirstname() + " " + author.getSurname());
+                log.debug("Updating author: " + author.getFirstname() + " " + author.getSurname() + ". Writing the update to database.");
                 am.updateAuthor(author);
 
                 return null;
@@ -159,7 +159,7 @@ public class AuthorsTableModel extends DefaultTableModel {
                 } catch (Exception e) {
                     log.error("There was an exception thrown during update of author: " + author.getFirstname() + " " + author.getSurname(), e);
                 }
-                log.debug("Updating table based on newly fetched data.");
+                log.debug("Updating authors table in GUI based on newly fetched data.");
                 fireTableDataChanged();
             }
         }.execute();

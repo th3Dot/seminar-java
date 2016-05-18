@@ -10,10 +10,7 @@ import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.Book;
 import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
-import cz.muni.fi.javaseminar.kafa.bookregister.gui.workers.BookBackendWorker;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,6 +21,8 @@ import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 import no.tornado.databinding.model.ListComboBoxModel;
 import org.jdesktop.swingx.JXDatePicker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -31,8 +30,9 @@ import org.jdesktop.swingx.JXDatePicker;
  */
 public class NewBookWindow extends javax.swing.JFrame {
 
-    private AuthorManager am = BackendService.getAuthorManager();
-    private BookManager bm = BackendService.getBookManager();
+    private final AuthorManager am = BackendService.getAuthorManager();
+    private final BookManager bm = BackendService.getBookManager();
+    private final static Logger log = LoggerFactory.getLogger(NewBookWindow.class);
 
     /**
      * Creates new form NewBookWindow
@@ -40,15 +40,37 @@ public class NewBookWindow extends javax.swing.JFrame {
     public NewBookWindow() {
         initComponents();
         publishDatePanel.add(datePicker);
-        List<String> authors = am.findAllAuthors()
-                .stream().map((Author x) -> x.getFirstname() + " " + x.getSurname())
-                .collect(Collectors.toList());
-        authorComboBox.setModel(new ListComboBoxModel(authors));
-        try {
-            authorComboBox.setSelectedIndex(0);
-        } catch (IllegalArgumentException e) {
-            authorComboBox.setSelectedIndex(-1);
-        }
+        new SwingWorker<Void, Void>() {
+            List<String> authors;
+
+            @Override
+            protected Void doInBackground() throws Exception {
+                log.debug("Fetching all authors from database for NewBookWindow.");
+                authors = am.findAllAuthors()
+                        .stream().map((Author x) -> x.getFirstname() + " " + x.getSurname())
+                        .collect(Collectors.toList());
+
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                } catch (Exception e) {
+                    log.error("There was an exception thrown while inicializing NewBookWindow", e);
+                    return;
+                }
+                log.debug("Filing ComboBox model in GUI with all authors.");
+                authorComboBox.setModel(new ListComboBoxModel(authors));
+                try {
+                    authorComboBox.setSelectedIndex(0);
+                } catch (IllegalArgumentException e) {
+                    authorComboBox.setSelectedIndex(-1);
+                }
+            }
+        }.execute();
+
     }
 
     /**
@@ -211,20 +233,34 @@ public class NewBookWindow extends javax.swing.JFrame {
         } else {
             date = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).toLocalDate();
         }
-        Book newBook = new Book(null, nameTextField.getText(), isbnTextField.getText(), date, am.findAllAuthors().get(authorComboBox.getSelectedIndex()).getId());
 
-        BookBackendWorker worker = new BookBackendWorker(newBook, BookBackendWorker.Method.CREATE);
-        worker.addPropertyChangeListener(new PropertyChangeListener() {
+        Book book = new Book(null, nameTextField.getText(), isbnTextField.getText(), date, am.findAllAuthors().get(authorComboBox.getSelectedIndex()).getId());
+
+        new SwingWorker<Void, Void>() {
 
             @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (((SwingWorker.StateValue) evt.getNewValue()).equals(SwingWorker.StateValue.DONE)) {
-                    t.dispatchEvent(new WindowEvent(t, WindowEvent.WINDOW_CLOSING));
-                }
+            protected Void doInBackground() throws Exception {
+
+                log.debug("Creating new book: " + book.getName() + ". Writing it to the database.");
+                bm.createBook(book);
+
+                return null;
             }
 
-        });
-        worker.execute();
+            @Override
+            protected void done() {
+                try {
+                    get();
+                } catch (Exception e) {
+                    log.error("There was an exception thrown during creation of new book.", e);
+                    return;
+                }
+
+                t.dispatchEvent(new WindowEvent(t, WindowEvent.WINDOW_CLOSING));
+
+            }
+
+        }.execute();
     }//GEN-LAST:event_createButtonActionPerformed
 
     private void publishDateLabelAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_publishDateLabelAncestorAdded
@@ -238,41 +274,6 @@ public class NewBookWindow extends javax.swing.JFrame {
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }//GEN-LAST:event_cancelButtonActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(NewBookWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(NewBookWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(NewBookWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(NewBookWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new NewBookWindow().setVisible(true);
-            }
-        });
-    }
 
     private JXDatePicker datePicker = new JXDatePicker();
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -22,7 +22,7 @@ public class SpawnNewAuthorWindow extends AbstractSpawnWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        JFrame newAuthorWindow = new NewAuthorWindow(spawningWindow.getAuthorManager(), spawningWindow.getBookManager());
+        JFrame newAuthorWindow = new NewAuthorWindow();
         newAuthorWindow.addWindowListener(focusPassingListener);
         newAuthorWindow.setVisible(true);
         spawningWindow.setEnabled(false);

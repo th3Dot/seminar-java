@@ -7,8 +7,7 @@ package cz.muni.fi.javaseminar.kafa.bookregister.gui;
 
 import cz.muni.fi.javaseminar.kafa.bookregister.Author;
 import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
-import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
-import cz.muni.fi.javaseminar.kafa.bookregister.gui.workers.AuthorBackendWorker;
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
 import java.awt.event.WindowEvent;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -31,16 +30,13 @@ import org.slf4j.LoggerFactory;
  */
 public class NewAuthorWindow extends javax.swing.JFrame {
 
-    private final static Logger log = LoggerFactory.getLogger(AuthorBackendWorker.class);
-    private AuthorManager am;
-    private BookManager bm;
+    private final static Logger log = LoggerFactory.getLogger(NewAuthorWindow.class);
+    private final AuthorManager am = BackendService.getAuthorManager();
 
     /**
      * Creates new form NewAuthorWindow
      */
-    public NewAuthorWindow(AuthorManager authorManger, BookManager bookManager) {
-        am = authorManger;
-        bm = bookManager;
+    public NewAuthorWindow() {
         initComponents();
         namePanel4.add(datePicker);
     }
@@ -228,7 +224,7 @@ public class NewAuthorWindow extends javax.swing.JFrame {
 
             @Override
             protected Void doInBackground() throws Exception {
-                log.debug("Creating new author: " + author.getFirstname() + " " + author.getSurname());
+                log.debug("Creating new author: " + author.getFirstname() + " " + author.getSurname() + ". Writing it to the database.");
                 am.createAuthor(author);
 
                 return null;
@@ -239,12 +235,11 @@ public class NewAuthorWindow extends javax.swing.JFrame {
                 try {
                     get();
                 } catch (Exception e) {
-                    log.error("There was an exception thrown during update of AuthorsTableModel.", e);
-                    JOptionPane.showMessageDialog(NewAuthorWindow.this, "Couldn't create author: " + e.getLocalizedMessage());
+                    log.error("There was an exception thrown while creating an author.", e);
+                    JOptionPane.showMessageDialog(NewAuthorWindow.this, "Can't create author: " + e.getMessage());
                     return;
                 }
 
-                log.debug("Updating table based on newly fetched data.");
                 t.dispatchEvent(new WindowEvent(t, WindowEvent.WINDOW_CLOSING));
 
             }

@@ -9,17 +9,12 @@ import cz.muni.fi.javaseminar.kafa.bookregister.Author;
 import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.Book;
 import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
-import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
-import cz.muni.fi.javaseminar.kafa.bookregister.gui.workers.BookBackendWorker;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import javax.swing.SwingWorker;
-import javax.swing.SwingWorker.StateValue;
 import javax.swing.table.DefaultTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,19 +49,37 @@ public class BooksTableModel extends DefaultTableModel {
         this.currentSelectedAuthor = currentSelectedAuthor;
     }
 
-    public BooksTableModel() {
-        am = BackendService.getAuthorManager();
-        bm = BackendService.getBookManager();
+    public BooksTableModel(AuthorManager authorManager, BookManager bookManager) {
+        am = authorManager;
+        bm = bookManager;
         rowCount = 0;
-        log.debug("inicializing BookTableModel");
     }
 
     public void setAuthorIndex(int index) {
         if (index >= 0) {
-            currentSelectedAuthor = am.findAllAuthors().get(index);
-            books = bm.findBooksByAuthor(currentSelectedAuthor);
-            rowCount = books.size();
+            new SwingWorker<Void, Void>() {
 
+                @Override
+                protected Void doInBackground() throws Exception {
+                    currentSelectedAuthor = am.findAllAuthors().get(index);
+                    books = bm.findBooksByAuthor(currentSelectedAuthor);
+                    rowCount = books.size();
+
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        get();
+                    } catch (Exception e) {
+                        log.error("There was an exception thrown", e);
+                        return;
+                    }
+
+                }
+
+            }.execute();
         } else {
             currentSelectedAuthor = null;
             books = null;
@@ -83,10 +96,10 @@ public class BooksTableModel extends DefaultTableModel {
 
                 @Override
                 protected Void doInBackground() throws Exception {
+                    log.debug("Fetching new data for BooksTableModel from database.");
                     Author author = am.findAuthorById(currentSelectedAuthor.getId());
                     if (author != null) {
                         books = bm.findBooksByAuthor(author);
-                        rowCount = books.size();
                     }
                     return null;
                 }
@@ -96,8 +109,12 @@ public class BooksTableModel extends DefaultTableModel {
                     try {
                         get();
                     } catch (Exception e) {
-                        log.error("There was an exception thrown when updating books table model.", e);
+                        log.error("There was an exception thrown during update of BooksTableModel.", e);
                         return;
+                    }
+                    log.debug("Updating books table in GUI based on newly fetched data.");
+                    if (books != null) {
+                        rowCount = books.size();
                     }
 
                     fireTableDataChanged();
@@ -131,18 +148,29 @@ public class BooksTableModel extends DefaultTableModel {
                 throw new IllegalArgumentException("columnIndex");
         }
 
-        BookBackendWorker worker = new BookBackendWorker(book, BookBackendWorker.Method.UPDATE);
-        worker.addPropertyChangeListener(new PropertyChangeListener() {
+        new SwingWorker<Void, Void>() {
 
             @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (((StateValue) evt.getNewValue()).equals(StateValue.DONE)) {
-                    fireTableCellUpdated(rowCount, rowCount);
-                }
+            protected Void doInBackground() throws Exception {
+                log.debug("Updating book: " + book.getName() + ". Writing the update to database.");
+                bm.updateBook(book);
+
+                return null;
             }
 
-        });
-        worker.execute();
+            @Override
+            protected void done() {
+                try {
+                    get();
+                } catch (Exception e) {
+                    log.error("There was an exception thrown during update of book: " + book.getName());
+                    return;
+                }
+                log.debug("Updating books table in GUI based on newly fetched data.");
+                fireTableDataChanged();
+            }
+
+        }.execute();
     }
 
     @Override
