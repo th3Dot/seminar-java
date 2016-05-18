@@ -16,6 +16,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
@@ -234,9 +235,9 @@ public class NewAuthorWindow extends javax.swing.JFrame {
             protected void done() {
                 try {
                     get();
-                } catch (Exception e) {
+                } catch (InterruptedException | ExecutionException e) {
+                    JOptionPane.showMessageDialog(NewAuthorWindow.this, "Can't create author: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     log.error("There was an exception thrown while creating an author.", e);
-                    JOptionPane.showMessageDialog(NewAuthorWindow.this, "Can't create author: " + e.getMessage());
                     return;
                 }
 

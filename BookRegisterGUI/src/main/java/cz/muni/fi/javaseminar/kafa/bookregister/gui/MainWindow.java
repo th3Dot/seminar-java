@@ -25,6 +25,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -42,6 +43,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.jdesktop.swingx.table.DatePickerCellEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  *
@@ -307,9 +309,12 @@ public class MainWindow extends javax.swing.JFrame {
                     protected void done() {
                         try {
                             get();
-                        } catch (Exception e) {
+                        } catch (InterruptedException | ExecutionException e) {
+                            if (e.getCause() instanceof DataIntegrityViolationException) {
+                                JOptionPane.showMessageDialog(MainWindow.this, "Couldn't delete author; there are still some books assigned to him.", "Error", JOptionPane.ERROR_MESSAGE);
+                            }
                             log.error("There was an exception thrown during deletion author: " + author.getFirstname() + " " + author.getSurname(), e);
-                            JOptionPane.showMessageDialog(MainWindow.this, "Couldn't delete author. Probably there are still some books assigned to him.");
+
                             return;
                         }
 
