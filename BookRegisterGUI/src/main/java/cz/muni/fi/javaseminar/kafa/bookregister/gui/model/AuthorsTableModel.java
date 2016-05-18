@@ -8,10 +8,6 @@ package cz.muni.fi.javaseminar.kafa.bookregister.gui.model;
 import cz.muni.fi.javaseminar.kafa.bookregister.Author;
 import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
-import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
-import cz.muni.fi.javaseminar.kafa.bookregister.gui.workers.AuthorBackendWorker;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -19,9 +15,9 @@ import java.util.Date;
 import java.util.List;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 /**
  *
  * @author Martin
@@ -34,7 +30,7 @@ public class AuthorsTableModel extends DefaultTableModel {
     private List<Author> authors;
     private int currentSlectedIndex;
     private int rowCount;
-    
+
     private final static Logger log = LoggerFactory.getLogger(AuthorsTableModel.class);
 
     public List<Author> getAuthors() {
@@ -45,12 +41,10 @@ public class AuthorsTableModel extends DefaultTableModel {
         this.authors = authors;
     }
 
-    public AuthorsTableModel() {
-        am = BackendService.getAuthorManager();
-        bm = BackendService.getBookManager();
-        authors = am.findAllAuthors();
-        rowCount = authors.size();
+    public AuthorsTableModel(AuthorManager authorManager, BookManager bookManager) {
         log.debug("inicializing AuthorsTableModel");
+        am = authorManager;
+        bm = bookManager;
     }
 
     public int getCurrentSlectedIndex() {
@@ -72,13 +66,33 @@ public class AuthorsTableModel extends DefaultTableModel {
     }
 
     public void updateData() {
-        authors = am.findAllAuthors();
-        rowCount = authors.size();
-        if (currentSlectedIndex > rowCount - 1) {
-            currentSlectedIndex = 0;
-        }
-        this.fireTableDataChanged();
+        new SwingWorker<Void, Void>() {
 
+            @Override
+            protected Void doInBackground() throws Exception {
+                log.debug("Fetching new data for AuthorsTableModel from database.");
+                authors = am.findAllAuthors();
+                rowCount = authors.size();
+                if (currentSlectedIndex > rowCount - 1) {
+                    currentSlectedIndex = 0;
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                } catch (Exception e) {
+                    log.error("There was an exception thrown during update of AuthorsTableModel.", e);
+                    return;
+                }
+
+                log.debug("Updating table based on newly fetched data.");
+                fireTableDataChanged();
+            }
+
+        }.execute();
     }
 
     @Override
@@ -128,19 +142,27 @@ public class AuthorsTableModel extends DefaultTableModel {
                 log.error("Unknown columnIndex in method setValueAt (AuthorsTableModel)");
                 throw new IllegalArgumentException("columnIndex");
         }
-        AuthorBackendWorker worker = new AuthorBackendWorker(author, AuthorBackendWorker.Method.UPDATE);
-        worker.execute();
-        worker.addPropertyChangeListener(new PropertyChangeListener() {
 
+        new SwingWorker<Void, Void>() {
             @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (((SwingWorker.StateValue) evt.getNewValue()).equals(SwingWorker.StateValue.DONE)) {
-                    fireTableCellUpdated(rowCount, rowCount);
-                }
+            protected Void doInBackground() throws Exception {
+                log.debug("Updating author on: " + author.getFirstname() + " " + author.getSurname());
+                am.updateAuthor(author);
+
+                return null;
             }
 
-        });
-        fireTableCellUpdated(rowIndex, columnIndex);
+            @Override
+            protected void done() {
+                try {
+                    get();
+                } catch (Exception e) {
+                    log.error("There was an exception thrown during update of author: " + author.getFirstname() + " " + author.getSurname(), e);
+                }
+                log.debug("Updating table based on newly fetched data.");
+                fireTableDataChanged();
+            }
+        }.execute();
     }
 
     @Override

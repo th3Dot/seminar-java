@@ -18,11 +18,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.table.DefaultTableModel;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 /**
  *
  * @author Martin
@@ -33,7 +34,7 @@ public class BooksTableModel extends DefaultTableModel {
     private final BookManager bm;
     private int rowCount;
     private List<Book> books;
-    
+
     private final static Logger log = LoggerFactory.getLogger(BooksTableModel.class);
 
     public List<Book> getBooks() {
@@ -65,12 +66,12 @@ public class BooksTableModel extends DefaultTableModel {
             currentSelectedAuthor = am.findAllAuthors().get(index);
             books = bm.findBooksByAuthor(currentSelectedAuthor);
             rowCount = books.size();
-            
+
         } else {
             currentSelectedAuthor = null;
             books = null;
             rowCount = 0;
-            
+
         }
 
         fireTableDataChanged();
@@ -78,9 +79,32 @@ public class BooksTableModel extends DefaultTableModel {
 
     public void updateData() {
         if (currentSelectedAuthor != null) {
-            books = bm.findBooksByAuthor(am.findAuthorById(currentSelectedAuthor.getId()));
-            rowCount = books.size();
-            this.fireTableDataChanged();
+            new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    Author author = am.findAuthorById(currentSelectedAuthor.getId());
+                    if (author != null) {
+                        books = bm.findBooksByAuthor(author);
+                        rowCount = books.size();
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        get();
+                    } catch (Exception e) {
+                        log.error("There was an exception thrown when updating books table model.", e);
+                        return;
+                    }
+
+                    fireTableDataChanged();
+                }
+
+            }.execute();
+
         }
     }
 

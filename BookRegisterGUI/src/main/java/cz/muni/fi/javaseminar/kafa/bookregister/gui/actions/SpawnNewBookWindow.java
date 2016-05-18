@@ -5,6 +5,7 @@
  */
 package cz.muni.fi.javaseminar.kafa.bookregister.gui.actions;
 
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.MainWindow;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.NewBookWindow;
 import java.awt.event.ActionEvent;
 import javax.swing.JFrame;
@@ -15,7 +16,7 @@ import javax.swing.JFrame;
  */
 public class SpawnNewBookWindow extends AbstractSpawnWindowAction {
 
-    public SpawnNewBookWindow(String name, JFrame spawningWindow) {
+    public SpawnNewBookWindow(String name, MainWindow spawningWindow) {
         super(name, spawningWindow);
     }
 

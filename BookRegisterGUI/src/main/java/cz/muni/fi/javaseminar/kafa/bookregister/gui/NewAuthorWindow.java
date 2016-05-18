@@ -8,11 +8,8 @@ package cz.muni.fi.javaseminar.kafa.bookregister.gui;
 import cz.muni.fi.javaseminar.kafa.bookregister.Author;
 import cz.muni.fi.javaseminar.kafa.bookregister.AuthorManager;
 import cz.muni.fi.javaseminar.kafa.bookregister.BookManager;
-import cz.muni.fi.javaseminar.kafa.bookregister.gui.backend.BackendService;
 import cz.muni.fi.javaseminar.kafa.bookregister.gui.workers.AuthorBackendWorker;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,9 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import no.tornado.databinding.model.ListComboBoxModel;
 import org.jdesktop.swingx.JXDatePicker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -31,13 +31,16 @@ import org.jdesktop.swingx.JXDatePicker;
  */
 public class NewAuthorWindow extends javax.swing.JFrame {
 
-    private AuthorManager am = BackendService.getAuthorManager();
-    private BookManager bm = BackendService.getBookManager();
+    private final static Logger log = LoggerFactory.getLogger(AuthorBackendWorker.class);
+    private AuthorManager am;
+    private BookManager bm;
 
     /**
      * Creates new form NewAuthorWindow
      */
-    public NewAuthorWindow() {
+    public NewAuthorWindow(AuthorManager authorManger, BookManager bookManager) {
+        am = authorManger;
+        bm = bookManager;
         initComponents();
         namePanel4.add(datePicker);
     }
@@ -219,61 +222,40 @@ public class NewAuthorWindow extends javax.swing.JFrame {
             date = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).toLocalDate();
         }
 
-        Author newAuthor = new Author(null, nameTextField.getText(), nameTextField1.getText(), jTextField1.getText(), (String) jComboBox1.getSelectedItem(), date);
+        Author author = new Author(null, nameTextField.getText(), nameTextField1.getText(), jTextField1.getText(), (String) jComboBox1.getSelectedItem(), date);
 
-        AuthorBackendWorker worker = new AuthorBackendWorker(newAuthor, AuthorBackendWorker.Method.CREATE);
-        worker.addPropertyChangeListener(new PropertyChangeListener() {
+        new SwingWorker<Void, Void>() {
 
             @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (((SwingWorker.StateValue) evt.getNewValue()).equals(SwingWorker.StateValue.DONE)) {
-                    t.dispatchEvent(new WindowEvent(t, WindowEvent.WINDOW_CLOSING));
-                }
+            protected Void doInBackground() throws Exception {
+                log.debug("Creating new author: " + author.getFirstname() + " " + author.getSurname());
+                am.createAuthor(author);
+
+                return null;
             }
 
-        });
-        worker.execute();
+            @Override
+            protected void done() {
+                try {
+                    get();
+                } catch (Exception e) {
+                    log.error("There was an exception thrown during update of AuthorsTableModel.", e);
+                    JOptionPane.showMessageDialog(NewAuthorWindow.this, "Couldn't create author: " + e.getLocalizedMessage());
+                    return;
+                }
 
+                log.debug("Updating table based on newly fetched data.");
+                t.dispatchEvent(new WindowEvent(t, WindowEvent.WINDOW_CLOSING));
+
+            }
+
+        }.execute();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(NewAuthorWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(NewAuthorWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(NewAuthorWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(NewAuthorWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new NewAuthorWindow().setVisible(true);
-            }
-        });
-    }
     private JXDatePicker datePicker = new JXDatePicker();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

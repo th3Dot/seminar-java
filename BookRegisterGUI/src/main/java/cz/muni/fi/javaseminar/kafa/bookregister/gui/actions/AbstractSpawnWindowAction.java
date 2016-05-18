@@ -5,11 +5,11 @@
  */
 package cz.muni.fi.javaseminar.kafa.bookregister.gui.actions;
 
+import cz.muni.fi.javaseminar.kafa.bookregister.gui.MainWindow;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import javax.swing.AbstractAction;
-import javax.swing.JFrame;
 
 /**
  *
@@ -17,10 +17,10 @@ import javax.swing.JFrame;
  */
 public abstract class AbstractSpawnWindowAction extends AbstractAction {
 
-    protected JFrame spawningWindow;
+    protected MainWindow spawningWindow;
     protected WindowListener focusPassingListener;
 
-    public AbstractSpawnWindowAction(String name, JFrame spawningWindow) {
+    public AbstractSpawnWindowAction(String name, MainWindow spawningWindow) {
         super(name);
         this.spawningWindow = spawningWindow;
         this.focusPassingListener = new WindowAdapter() {
