@@ -66,7 +66,7 @@ public class AuthorsTableModel extends DefaultTableModel {
         return 5;
     }
 
-    public void updateData() {
+    public void updateAuthors() {
         new SwingWorker<Void, Void>() {
 
             @Override

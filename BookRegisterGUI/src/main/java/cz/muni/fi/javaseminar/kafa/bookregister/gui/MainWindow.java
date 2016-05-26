@@ -317,8 +317,7 @@ public class MainWindow extends javax.swing.JFrame {
     }
 
     public void updateModel() {
-        authorsTableModel.updateData();
-        booksTableModel.updateData();
+        authorsTableModel.updateAuthors();
     }
 
     /**

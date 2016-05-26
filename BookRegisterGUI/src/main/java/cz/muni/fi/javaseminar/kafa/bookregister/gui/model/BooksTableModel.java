@@ -95,6 +95,7 @@ public class BooksTableModel extends DefaultTableModel {
 
     }
 
+    /*
     public void updateData() {
         if (currentSelectedAuthor != null) {
             new SwingWorker<Void, Void>() {
@@ -128,8 +129,9 @@ public class BooksTableModel extends DefaultTableModel {
             }.execute();
 
         }
-    }
 
+    }
+*/
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         Book book = books.get(rowIndex);
