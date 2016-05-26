@@ -222,7 +222,10 @@ public class MainWindow extends javax.swing.JFrame {
                     authorsTableModel.setCurrentSlectedIndex(source.getMinSelectionIndex());
                 }
 
-                booksTableModel.setAuthorIndex(source.getMinSelectionIndex());
+                if (!e.getValueIsAdjusting()) {
+                    booksTableModel.setAuthorIndex(source.getMinSelectionIndex());
+                }
+
             }
         });
 
@@ -241,20 +244,6 @@ public class MainWindow extends javax.swing.JFrame {
 
                 return super.getTableCellRendererComponent(jtable, value, selected, hasFocus, row, column);
 
-            }
-        });
-
-        authorsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        selectionModel = authorsTable.getSelectionModel();
-        selectionModel.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                DefaultListSelectionModel source = (DefaultListSelectionModel) e.getSource();
-                if (source.getMinSelectionIndex() >= 0) {
-                    authorsTableModel.setCurrentSlectedIndex(source.getMinSelectionIndex());
-                }
-
-                booksTableModel.setAuthorIndex(source.getMinSelectionIndex());
             }
         });
 

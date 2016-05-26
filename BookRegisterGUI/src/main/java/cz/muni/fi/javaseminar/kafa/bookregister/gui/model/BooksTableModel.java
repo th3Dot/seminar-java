@@ -61,9 +61,9 @@ public class BooksTableModel extends DefaultTableModel {
 
                 @Override
                 protected Void doInBackground() throws Exception {
+                    log.debug("Author was changed; fetching books of new selected author from database.");
                     currentSelectedAuthor = am.findAllAuthors().get(index);
                     books = bm.findBooksByAuthor(currentSelectedAuthor);
-                    rowCount = books.size();
 
                     return null;
                 }
@@ -72,6 +72,9 @@ public class BooksTableModel extends DefaultTableModel {
                 protected void done() {
                     try {
                         get();
+                        rowCount = books.size();
+                        log.debug("Updating books of new selected author in GUI.");
+                        fireTableDataChanged();
                     } catch (Exception e) {
                         log.error("There was an exception thrown", e);
                         return;
@@ -85,9 +88,11 @@ public class BooksTableModel extends DefaultTableModel {
             books = null;
             rowCount = 0;
 
+            log.debug("Updating books of new selected author in GUI..");
+            fireTableDataChanged();
+
         }
 
-        fireTableDataChanged();
     }
 
     public void updateData() {
